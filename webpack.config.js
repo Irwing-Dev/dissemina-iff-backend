@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 const path = require('path')    //communJS
 
 module.exports = {
@@ -25,4 +26,33 @@ module.exports = {
         }]
     },
     devtool: 'source-map'
+=======
+const path = require('path')    //communJS
+
+module.exports = {
+    mode: 'development',    
+    entry: './frontend/main.js',
+
+    output: {
+        path: path.resolve(__dirname, 'public', 'assets', 'js'),
+        
+        filename: 'bundle.js'
+    },
+    module: {
+        rules: [{
+            exclude: /node_modules/,
+            test: /\.js$/,
+            use: {
+                loader: 'babel-loader',
+                options: {
+                    presets: ['@babel/env']
+                }
+            }
+        }, {
+            test: /\.css$/,
+            use: ['style-loader', 'css-loader']
+        }]
+    },
+    devtool: 'source-map'
+>>>>>>> f42ebb8 (feat: estrutura de pastas)
 }
