@@ -1,89 +1,110 @@
-const personagens = require('../controllers/global').personagens
-const dados = require('../controllers/dados').dados
+const { personagens } = require('./global')
 
 exports.logIn = (req, res) => {
-    res.send('login')
+  res.json({ mensagem: 'Login endpoint ativo. Envie dados via POST se necessário.' })
 }
 
+// 📜 Retorna estado atual do jogador
 exports.jogador = (req, res) => {
-    res.send({
-        dado:'full', 
-        nomeDado: 'Dados', 
-        passoAtual: personagens[String(req.params.jogador)].passoAtual, 
-        votacaoAtual: personagens[String(req.params.jogador)].votacaoAtual, 
-        votacaoAberta: personagens[String(req.params.jogador)].votacaoAberta, 
-        resultadoVotacao: personagens[String(req.params.jogador)].mensagemVotacao, 
-        jogador: req.params.jogador
-    })
+  const jogador = personagens[String(req.params.jogador)]
+  if (!jogador) return res.status(404).json({ erro: 'Jogador não encontrado' })
+
+  res.json({
+    nomeDado: 'Dados',
+    passoAtual: jogador.passoAtual,
+    votacaoAtual: jogador.votacaoAtual,
+    votacaoAberta: jogador.votacaoAberta,
+    resultadoVotacao: jogador.mensagemVotacao,
+    jogador: req.params.jogador
+  })
 }
 
+// 🎲 Rola todos os dados
 exports.full = (req, res) => {
-    
-    if (personagens[String(req.params.jogador)].rolagemAberta) {
-        
-        rollD6 = Math.floor(Math.random()*6)
-        personagens[String(req.params.jogador)].d6[rollD6] = personagens[String(req.params.jogador)].d6[rollD6] + 1
-        rollD6 = rollD6+1
-        personagens[String(req.params.jogador)].rolagensD6++
-        
-        rollD10_1 = Math.floor(Math.random()*10)
-        personagens[String(req.params.jogador)].d10_1[rollD10_1] = personagens[String(req.params.jogador)].d10_1[rollD10_1] + 1
-        rollD10_1 = rollD10_1+1
-        personagens[String(req.params.jogador)].rolagensD10_1++
-        
-        rollD10_2 = Math.floor(Math.random()*10)
-        personagens[String(req.params.jogador)].d10_2[rollD10_2] = personagens[String(req.params.jogador)].d10_2[rollD10_2] + 1
-        rollD10_2 = rollD10_2+1
-        personagens[String(req.params.jogador)].rolagensD10_2++
-        
-        resultado = `Dado de ação (D6): ${rollD6} <br> Dado de desafio 1 (D10): ${rollD10_1} <br> Dado de desafio 2 (D10): ${rollD10_2}`
-        resolucao = `Desconsiderando bônus/penalidade sua rolagem seria um: ${personagens[String(req.params.jogador)].resolucaoIronsworn(rollD6, rollD10_1, rollD10_2)}`
-        console.log(`${personagens[String(req.params.jogador)].rolagensD10_2} rolagens no total, Dado de ação (D6): ${rollD6}`)
+  const jogador = personagens[String(req.params.jogador)]
+  if (!jogador) return res.status(404).json({ erro: 'Jogador não encontrado' })
 
-        res.send({
-            dado:'full', 
-            nomeDado: 'Dados', 
-            resultado, 
-            rolagem: personagens[String(req.params.jogador)].rolagensD6, 
-            resolucao: resolucao, 
-            passoAtual: personagens[String(req.params.jogador)].passoAtual, 
-            votacaoAberta: personagens[String(req.params.jogador)].votacaoAberta, 
-            votacaoAtual: personagens[String(req.params.jogador)].votacaoAtual, 
-            jogador: req.params.jogador
-        })
-    } else {
-        res.send({
-            dado:'full', 
-            nomeDado: 'Dados', 
-            mensagem:'Rolagem de dados bloqueada pelo mestre do jogo.', 
-            passoAtual: personagens[String(req.params.jogador)].passoAtual, 
-            votacaoAberta: personagens[String(req.params.jogador)].votacaoAberta, 
-            votacaoAtual: personagens[String(req.params.jogador)].votacaoAtual, 
-            jogador: req.params.jogador        
-        })
+  if (jogador.rolagemAberta) {
+    const rollD6 = Math.floor(Math.random() * 6) + 1
+    const rollD10_1 = Math.floor(Math.random() * 10) + 1
+    const rollD10_2 = Math.floor(Math.random() * 10) + 1
+
+    jogador.rolagensD6++
+    jogador.rolagensD10_1++
+    jogador.rolagensD10_2++
+
+    const resultado = {
+      D6: rollD6,
+      D10_1: rollD10_1,
+      D10_2: rollD10_2
     }
+
+    const resolucao = jogador.resolucaoIronsworn(rollD6, rollD10_1, rollD10_2)
+
+    res.json({
+      dado: 'full',
+      resultado,
+      resolucao,
+      rolagem: jogador.rolagensD6,
+      passoAtual: jogador.passoAtual,
+      votacaoAberta: jogador.votacaoAberta,
+      votacaoAtual: jogador.votacaoAtual,
+      jogador: req.params.jogador
+    })
+  } else {
+    res.status(403).json({
+      mensagem: 'Rolagem de dados bloqueada pelo mestre do jogo.',
+      jogador: req.params.jogador
+    })
+  }
 }
 
+// 🗳️ Retorna opções de votação
 exports.votacao = (req, res) => {
-    if(personagens[String(req.params.jogador)].votacaoAberta) {
-        res.send({
-            jogador: req.params.jogador,
-            opcoes: personagens[String(req.params.jogador)].opcoes,
-            votacaoAberta: personagens[String(req.params.jogador)].votacaoAberta
-        })
-    } else {
-        res.redirect(`/jogador/${req.params.jogador}`)
-    }
+  const jogador = personagens[String(req.params.jogador)]
+  if (!jogador) return res.status(404).json({ erro: 'Jogador não encontrado' })
+
+  if (jogador.votacaoAberta) {
+    res.json({
+      jogador: req.params.jogador,
+      opcoes: jogador.opcoes,
+      votacaoAberta: true
+    })
+  } else {
+    res.json({
+      jogador: req.params.jogador,
+      mensagem: 'Nenhuma votação ativa.'
+    })
+  }
 }
 
+// ✅ Registrar voto
 exports.depositaVoto = (req, res) => {
-    console.log(`Voto: ${req.params.voto}`)
-    for(let opcao in personagens[String(req.params.jogador)].opcoes) {
-        if(req.params.voto == personagens[String(req.params.jogador)].opcoes[opcao]) {
-            personagens[String(req.params.jogador)].votacao[opcao]++
-        }
-    }
-    personagens[String(req.params.jogador)].votacaoAtual++
+  const jogador = personagens[String(req.params.jogador)]
+  if (!jogador) return res.status(404).json({ erro: 'Jogador não encontrado' })
 
-    res.redirect(`/jogador/${req.params.jogador}`)
+  const voto = req.params.voto
+  let votoValido = false
+
+  for (let i = 0; i < jogador.opcoes.length; i++) {
+    if (voto === jogador.opcoes[i]) {
+      jogador.votacao[i]++
+      jogador.votacaoAtual++
+      votoValido = true
+      break
+    }
+  }
+
+  if (votoValido) {
+    res.json({
+      mensagem: 'Voto computado com sucesso.',
+      jogador: req.params.jogador,
+      votacaoAtual: jogador.votacaoAtual
+    })
+  } else {
+    res.status(400).json({
+      erro: 'Opção de voto inválida.',
+      jogador: req.params.jogador
+    })
+  }
 }

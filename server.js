@@ -9,11 +9,11 @@ const routes = require('./routes')
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 
-//falando pro nosso servidor usar o views para renderizar um html
+app.use(express.static(path.join(__dirname, 'public')))
 
-app.use(routes)
+app.use('/api', routes)
 
     app.listen(3000, () => {
-        console.log('acessar: http://localhost:3000')
         console.log('Servidor executando na porta 3000')
+        console.log('acessar: http://localhost:3000/api')
     })

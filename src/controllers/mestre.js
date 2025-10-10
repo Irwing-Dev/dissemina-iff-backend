@@ -4,11 +4,11 @@ const personagens = require('../controllers/global').personagens
 
 //rotas gerais do mestre
 exports.index = (req, res) => {
-    res.send({jogador: req.params.jogador})
+    res.json({jogador: req.params.jogador})
 }
 
 exports.controle = (req, res) => {
-    res.send({jogador: req.params.jogador})
+    res.json({jogador: req.params.jogador})
 }
 
 
@@ -40,7 +40,7 @@ exports.exibeRolgem = (req, res) => {
     let resolucao = personagens[String(req.params.jogador)].resolucaoIronsworn(total, desafio1, desafio2)
     total = `${acao} + ${bonus} = ${total}`
     console.log(`Ação: ${acao}, Desafio 1: ${desafio1}, Desafio 2: ${desafio2}, Total: ${total}, Resolução: ${resolucao}`)
-    res.send({total, desafio1, desafio2, resolucao, d6, jogador: req.params.jogador})
+    res.json({total, desafio1, desafio2, resolucao, d6, jogador: req.params.jogador})
 }
 
 exports.voltar = (req, res) => {
@@ -52,7 +52,7 @@ exports.voltar = (req, res) => {
 
 //rotas do mestre para escolhas
 exports.criaVotacao = (req, res) => {
-    res.send({jogador: req.params.jogador})
+    res.json({jogador: req.params.jogador})
 
 }
 
@@ -65,7 +65,7 @@ exports.esperaVotacao = (req, res) => {
     }
 
     personagens[String(req.params.jogador)].votacaoAtual = 0
-    res.send({jogador: req.params.jogador})
+    res.json({jogador: req.params.jogador})
 }
 
 exports.votacaoEstado = (req, res) => {
