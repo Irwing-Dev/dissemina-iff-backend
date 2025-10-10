@@ -1,7 +1,2 @@
-<<<<<<< HEAD
 # Auto detect text files and perform LF normalization
 * text=auto
-=======
-# Auto detect text files and perform LF normalization
-* text=auto
->>>>>>> f42ebb8 (feat: estrutura de pastas)
