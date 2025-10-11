@@ -5,7 +5,7 @@ import 'dotenv/config';
 
 //chamando o path pra não ter problema com o caminho dos arquivos, chamando o routes pra fazer o arquivo de rotas e o globalMiddleware pra fazer o middleware global
 import path from 'path';
-import routes from './routes';
+import routes from './routes.js';
 
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
