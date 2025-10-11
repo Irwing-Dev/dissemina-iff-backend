@@ -1,4 +1,4 @@
-import personagens from './global';
+import { personagens } from './global';
 
 const logIn = (req, res) => {
   res.json({ mensagem: 'Login endpoint ativo. Envie dados via POST se necessário.' })

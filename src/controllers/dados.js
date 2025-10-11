@@ -87,7 +87,7 @@ const desafio2 = (req, res) => {
   })
 }
 
-export default {
+export const dados = {
   d6: d6Handler,
   d10_1: d10_1Handler,
   d10_2: d10_2Handler,

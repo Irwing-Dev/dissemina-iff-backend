@@ -1,4 +1,4 @@
-import personagens from './global';
+import { personagens } from './global';
 
 //rotas gerais do mestre
 const index = (req, res) => {

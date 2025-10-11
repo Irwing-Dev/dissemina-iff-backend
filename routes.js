@@ -1,7 +1,7 @@
 import express from 'express'   //pegando o express q eu baixei
 import jogador from './src/controllers/jogador' //importando o arquivo global.js
 import mestre from './src/controllers/mestre' //importando o arquivo mestre.js
-import dados from './src/controllers/dados' //importando o arquivo dados.js
+import { dados } from './src/controllers/dados' //importando o arquivo dados.js
 
 const route = express.Router()
 

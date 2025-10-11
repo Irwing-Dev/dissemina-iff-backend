@@ -123,9 +123,8 @@ let jogador3 = new Jogador(
 
 
 
-export default {
-    jogador1,
-    jogador2,
-    jogador3,
+export const personagens = { 
+    jogador1, 
+    jogador2, 
+    jogador3 
 }
-
