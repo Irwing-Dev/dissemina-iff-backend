@@ -1,11 +1,11 @@
-import personagens from './global'
+import personagens from './global';
 
-exports.logIn = (req, res) => {
+const logIn = (req, res) => {
   res.json({ mensagem: 'Login endpoint ativo. Envie dados via POST se necessário.' })
 }
 
 // 📜 Retorna estado atual do jogador
-exports.jogador = (req, res) => {
+const jogador = (req, res) => {
   const jogador = personagens[String(req.params.jogador)]
   if (!jogador) return res.status(404).json({ erro: 'Jogador não encontrado' })
 
@@ -20,7 +20,7 @@ exports.jogador = (req, res) => {
 }
 
 // 🎲 Rola todos os dados
-exports.full = (req, res) => {
+const full = (req, res) => {
   const jogador = personagens[String(req.params.jogador)]
   if (!jogador) return res.status(404).json({ erro: 'Jogador não encontrado' })
 
@@ -60,7 +60,7 @@ exports.full = (req, res) => {
 }
 
 // 🗳️ Retorna opções de votação
-exports.votacao = (req, res) => {
+const votacao = (req, res) => {
   const jogador = personagens[String(req.params.jogador)]
   if (!jogador) return res.status(404).json({ erro: 'Jogador não encontrado' })
 
@@ -79,7 +79,7 @@ exports.votacao = (req, res) => {
 }
 
 // ✅ Registrar voto
-exports.depositaVoto = (req, res) => {
+const depositaVoto = (req, res) => {
   const jogador = personagens[String(req.params.jogador)]
   if (!jogador) return res.status(404).json({ erro: 'Jogador não encontrado' })
 
@@ -107,4 +107,12 @@ exports.depositaVoto = (req, res) => {
       jogador: req.params.jogador
     })
   }
+}
+
+export default {
+  logIn,
+  jogador,
+  full,
+  votacao, 
+  depositaVoto
 }

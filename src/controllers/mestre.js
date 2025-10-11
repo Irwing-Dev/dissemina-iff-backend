@@ -1,17 +1,17 @@
-const personagens = require('../controllers/global').personagens
+import personagens from './global';
 
 //rotas gerais do mestre
-exports.index = (req, res) => {
+const index = (req, res) => {
     res.json({jogador: req.params.jogador})
 }
 
-exports.controle = (req, res) => {
+const controle = (req, res) => {
     res.json({jogador: req.params.jogador})
 }
 
 
 //rotas do mestre para dados
-exports.resetaDados = (req, res) => {
+const resetaDados = (req, res) => {
     personagens[String(req.params.jogador)].resetaDado(personagens[String(req.params.jogador)].d6, 6)
     personagens[String(req.params.jogador)].rolagensD6 = 0
     personagens[String(req.params.jogador)].resetaDado(personagens[String(req.params.jogador)].d10_1, 10)
@@ -22,12 +22,12 @@ exports.resetaDados = (req, res) => {
     res.json({jogador: req.params.jogador})
 }
 
-exports.rolagensEstado = (req, res) => {
+const rolagensEstado = (req, res) => {
     console.log(`Rolagens: ${personagens[String(req.params.jogador)].rolagensD6}`)
     res.json({ rolagens: personagens[String(req.params.jogador)].rolagensD6 })
 }
 
-exports.exibeRolgem = (req, res) => {
+const exibeRolgem = (req, res) => {
     console.log(personagens[String(req.params.jogador)])
     personagens[String(req.params.jogador)].rolagemAberta = false
     const acao = personagens[String(req.params.jogador)].moda(personagens[String(req.params.jogador)].d6, 6)
@@ -41,7 +41,7 @@ exports.exibeRolgem = (req, res) => {
     res.json({total, desafio1, desafio2, resolucao, d6, jogador: req.params.jogador})
 }
 
-exports.voltar = (req, res) => {
+const voltar = (req, res) => {
     res.redirect(`/mestre/${req.params.jogador}`)
 }
 
@@ -49,12 +49,12 @@ exports.voltar = (req, res) => {
 
 
 //rotas do mestre para escolhas
-exports.criaVotacao = (req, res) => {
+const criaVotacao = (req, res) => {
     res.json({jogador: req.params.jogador})
 
 }
 
-exports.esperaVotacao = (req, res) => {
+const esperaVotacao = (req, res) => {
     personagens[String(req.params.jogador)].votacaoAberta = true
     personagens[String(req.params.jogador)].opcoes = req.body.opcao
 
@@ -66,6 +66,18 @@ exports.esperaVotacao = (req, res) => {
     res.json({jogador: req.params.jogador})
 }
 
-exports.votacaoEstado = (req, res) => {
+const votacaoEstado = (req, res) => {
     res.json({ votosTotal: personagens[String(req.params.jogador)].votosTotal })
+}
+
+export default {
+    index,
+    controle,
+    resetaDados,
+    rolagensEstado,
+    exibeRolgem,
+    voltar,
+    criaVotacao,
+    esperaVotacao,
+    votacaoEstado
 }
