@@ -123,7 +123,7 @@ let jogador3 = new Jogador(
 
 
 
-module.exports.personagens = {
+export default {
     jogador1,
     jogador2,
     jogador3,

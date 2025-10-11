@@ -1,5 +1,3 @@
-const e = require('connect-flash')
-
 const personagens = require('../controllers/global').personagens
 
 //rotas gerais do mestre
@@ -21,7 +19,7 @@ exports.resetaDados = (req, res) => {
     personagens[String(req.params.jogador)].resetaDado(personagens[String(req.params.jogador)].d10_2, 10)
     personagens[String(req.params.jogador)].rolagensD10_2 = 0
     personagens[String(req.params.jogador)].rolagemAberta = true
-    res.send({jogador: req.params.jogador})
+    res.json({jogador: req.params.jogador})
 }
 
 exports.rolagensEstado = (req, res) => {

@@ -1,4 +1,4 @@
-const { personagens } = require('./global')
+import personagens from './global'
 
 exports.logIn = (req, res) => {
   res.json({ mensagem: 'Login endpoint ativo. Envie dados via POST se necessário.' })

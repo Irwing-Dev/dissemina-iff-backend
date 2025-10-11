@@ -1,9 +1,9 @@
-const express = require('express')   //pegando o express q eu baixei
-const route = express.Router()
-const jogador = require('./src/controllers/jogador') //importando o arquivo global.js
-const mestre = require('./src/controllers/mestre') //importando o arquivo mestre.js
-const dados = require('./src/controllers/dados').dados //importando o arquivo dados.js
+import express from 'express'   //pegando o express q eu baixei
+import jogador from './src/controllers/jogador' //importando o arquivo global.js
+import mestre from './src/controllers/mestre' //importando o arquivo mestre.js
+import dados from './src/controllers/dados' //importando o arquivo dados.js
 
+const route = express.Router()
 
 // Rotas da raiz do site
 route.get('/', jogador.logIn)
