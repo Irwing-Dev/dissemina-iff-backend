@@ -1,5 +1,3 @@
-
-
 class Jogador {
     constructor(d6, d10_1, d10_2, rolagensD6, rolagensD10_1, rolagensD10_2, rolagemAberta, votacaoAberta, passoAtual, votacaoAtual, mensagemVotacao, votacao, opcoes, votosTotal) {
         this.d6 = d6
@@ -70,58 +68,16 @@ class Jogador {
     
 }
 
-let jogador1 = new Jogador(
-    d6 = [],
-    d10_1 = [],
-    d10_2 = [],
-    rolagensD6 = 0,
-    rolagensD10_1 = 0,
-    rolagensD10_2 = 0,
-    rolagemAberta = false,
-    votacaoAberta = false,
-    passoAtual = -1,
-    votacaoAtual = 0,
-    mensagemVotacao = '',
-    votacao = [],
-    opcoes = [],
-    votosTotal = 0,
-)
+// Vou fazer do meu jeito essa budega, minha preguiça me impede de ver isso e não deixar mais fácil
+function novoJogador() {
+    return new Jogador([], [], [], 0, 0, 0, false, false, -1, 0, '', [], [], 0)
+}
 
-let jogador2 = new Jogador(
-    d6 = [],
-    d10_1 = [],
-    d10_2 = [],
-    rolagensD6 = 0,
-    rolagensD10_1 = 0,
-    rolagensD10_2 = 0,
-    rolagemAberta = false,
-    votacaoAberta = false,
-    passoAtual = -1,
-    votacaoAtual = 0,
-    mensagemVotacao = '',
-    votacao = [],
-    opcoes = [],
-    votosTotal = 0,
-)
+let jogador1 = novoJogador()
 
-let jogador3 = new Jogador(
-    d6 = [],
-    d10_1 = [],
-    d10_2 = [],
-    rolagensD6 = 0,
-    rolagensD10_1 = 0,
-    rolagensD10_2 = 0,
-    rolagemAberta = false,
-    votacaoAberta = false,
-    passoAtual = -1,
-    votacaoAtual = 0,
-    mensagemVotacao = '',
-    votacao = [],
-    opcoes = [],
-    votosTotal = 0,
-)
+let jogador2 = novoJogador()
 
-
+let jogador3 = novoJogador()
 
 export const personagens = { 
     jogador1, 

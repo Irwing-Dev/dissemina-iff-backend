@@ -1,7 +1,7 @@
 import express from 'express'   //pegando o express q eu baixei
-import jogador from './src/controllers/jogador' //importando o arquivo global.js
-import mestre from './src/controllers/mestre' //importando o arquivo mestre.js
-import { dados } from './src/controllers/dados' //importando o arquivo dados.js
+import jogador from './src/controllers/jogador.js' //importando o arquivo global.js
+import mestre from './src/controllers/mestre.js' //importando o arquivo mestre.js
+import { dados } from './src/controllers/dados.js' //importando o arquivo dados.js
 
 const route = express.Router()
 
@@ -39,4 +39,4 @@ route.post('/jogador/:jogador/votacao', jogador.votacao)
 route.post('/jogador/:jogador/votacao/:voto', jogador.depositaVoto)
 
 
-module.exports = route
+export default route
