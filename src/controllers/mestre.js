@@ -27,7 +27,7 @@ const rolagensEstado = (req, res) => {
     res.json({ rolagens: personagens[String(req.params.jogador)].rolagensD6 })
 }
 
-const exibeRolgem = (req, res) => {
+const exibeRolagem = (req, res) => {
     console.log(personagens[String(req.params.jogador)])
     personagens[String(req.params.jogador)].rolagemAberta = false
     const acao = personagens[String(req.params.jogador)].moda(personagens[String(req.params.jogador)].d6, 6)
@@ -75,7 +75,7 @@ export default {
     controle,
     resetaDados,
     rolagensEstado,
-    exibeRolgem,
+    exibeRolagem,
     voltar,
     criaVotacao,
     esperaVotacao,
