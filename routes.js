@@ -17,7 +17,6 @@ route.get('/mestre/:jogador', mestre.controle)
 route.get('/mestre/:jogador/resetaDados', mestre.resetaDados)
 route.get('/mestre/:jogador/rolagensEstado', mestre.rolagensEstado)
 route.post('/mestre/:jogador/exibeRolagem', mestre.exibeRolagem)
-route.post('/mestre/:jogador/voltar', mestre.voltar)
 
 //rotas do mestre para escolhas
 route.post('/mestre/:jogador/criaVotacao', mestre.criaVotacao)

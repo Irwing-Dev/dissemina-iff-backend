@@ -1,86 +1,98 @@
 class Jogador {
-    constructor(d6, d10_1, d10_2, rolagensD6, rolagensD10_1, rolagensD10_2, rolagemAberta, votacaoAberta, passoAtual, votacaoAtual, mensagemVotacao, votacao, opcoes, votosTotal) {
-        this.d6 = d6
-        this.d10_1 = d10_1
-        this.d10_2 = d10_2
-        this.rolagensD6 = rolagensD6
-        this.rolagensD10_1 = rolagensD10_1
-        this.rolagensD10_2 = rolagensD10_2
-        this.rolagemAberta = rolagemAberta
-        this.votacaoAberta = votacaoAberta
-        this.passoAtual = passoAtual
-        this.votacaoAtual = votacaoAtual
-        this.mensagemVotacao = mensagemVotacao
-        this.votacao = votacao
-        this.opcoes = opcoes
-        this.votosTotal = votosTotal
-    }
+  constructor(
+    d6 = Array(6).fill(0),
+    d10_1 = Array(10).fill(0),
+    d10_2 = Array(10).fill(0),
+    rolagensD6 = 0,
+    rolagensD10_1 = 0,
+    rolagensD10_2 = 0,
+    rolagemAberta = false,
+    votacaoAberta = false,
+    passoAtual = -1,
+    votacaoAtual = 0,
+    mensagemVotacao = '',
+    votacao = [],
+    opcoes = [],
+    votosTotal = 0
+  ) {
+    this.d6 = d6;
+    this.d10_1 = d10_1;
+    this.d10_2 = d10_2;
+    this.rolagensD6 = rolagensD6;
+    this.rolagensD10_1 = rolagensD10_1;
+    this.rolagensD10_2 = rolagensD10_2;
+    this.rolagemAberta = rolagemAberta;
+    this.votacaoAberta = votacaoAberta;
+    this.passoAtual = passoAtual;
+    this.votacaoAtual = votacaoAtual;
+    this.mensagemVotacao = mensagemVotacao;
+    this.votacao = votacao;
+    this.opcoes = opcoes;
+    this.votosTotal = votosTotal;
+  }
 
-    maioria() {
-        const maior = Math.max(votosItem, votosFugir, votosMeele, votosRanged)
-        if (maior === votosRanged) { 
-            return `Ataque à distância`
-        } else if (maior === votosMeele) { 
-            return `Ataque corpo-a-corpo`
-        } else if (maior === votosItem) { 
-            return `Usar Item`
-        } else { 
-            return `Fugir`
-        }
-    }
+  // --- Funções principais ---
 
-    resetaDado(dado, lados) {
-        for (let i=0; i<lados; i++) {
-            dado[i] = 0
-        }
+  maioria() {
+    // Exemplo de votação — valores devem vir da lógica do jogo
+    const votosItem = this.votacao[0] || 0;
+    const votosFugir = this.votacao[1] || 0;
+    const votosMeele = this.votacao[2] || 0;
+    const votosRanged = this.votacao[3] || 0;
+
+    const maior = Math.max(votosItem, votosFugir, votosMeele, votosRanged);
+
+    if (maior === votosRanged) return 'Ataque à distância';
+    if (maior === votosMeele) return 'Ataque corpo-a-corpo';
+    if (maior === votosItem) return 'Usar Item';
+    return 'Fugir';
+  }
+
+  resetaDado(dado, lados) {
+    if (!Array.isArray(dado)) return;
+    for (let i = 0; i < lados; i++) {
+      dado[i] = 0;
     }
-    
-    moda(dado, lados) {
-        let resultado = 0, check = 0
-        for (let i=0; i<lados; i++) {
-            if (lados==6 && dado[i] >= check) {
-                check = dado[i]
-                resultado = i
-            }
-            if (lados==10 && dado[i] > check) {
-                check = dado[i]
-                resultado = i
-            }
-        }
-        resultado++
-        return resultado
+  }
+
+  moda(dado, lados) {
+    if (!Array.isArray(dado) || dado.length === 0) return 1;
+    let resultado = 0;
+    let check = 0;
+
+    for (let i = 0; i < lados; i++) {
+      if (lados === 6 && dado[i] >= check) {
+        check = dado[i];
+        resultado = i;
+      }
+      if (lados === 10 && dado[i] > check) {
+        check = dado[i];
+        resultado = i;
+      }
     }
-    
-    resolucaoIronsworn(total, desafio1, desafio2) {
-        let resolucao
-        if (total > desafio1 && total > desafio2 && desafio1 == desafio2)
-            resolucao = 'Acerto Crítico!' 
-        else if (total > desafio1 && total > desafio2)
-            resolucao = 'Acerto Forte!'
-        else if (total <= desafio1 && total <= desafio2 && desafio1 == desafio2)
-            resolucao = 'Erro Crítico!'
-        else if (total <= desafio1 && total <= desafio2)
-            resolucao = 'Erro!'
-        else
-            resolucao = 'Acerto Fraco.'
-        return resolucao
-    }
-    
+    resultado++;
+    return resultado
+  }
+
+  resolucaoIronsworn(total, desafio1, desafio2) {
+    if (total > desafio1 && total > desafio2 && desafio1 === desafio2)
+      return 'Acerto Crítico!';
+    if (total > desafio1 && total > desafio2)
+      return 'Acerto Forte!';
+    if (total <= desafio1 && total <= desafio2 && desafio1 === desafio2)
+      return 'Erro Crítico!';
+    if (total <= desafio1 && total <= desafio2)
+      return 'Erro!';
+    return 'Acerto Fraco.';
+  }
 }
 
-// Vou fazer do meu jeito essa budega, minha preguiça me impede de ver isso e não deixar mais fácil
 function novoJogador() {
-    return new Jogador([], [], [], 0, 0, 0, false, false, -1, 0, '', [], [], 0)
+  return new Jogador();
 }
 
-let jogador1 = novoJogador()
-
-let jogador2 = novoJogador()
-
-let jogador3 = novoJogador()
-
-export const personagens = { 
-    jogador1, 
-    jogador2, 
-    jogador3 
-}
+export const personagens = {
+  jogador1: novoJogador(),
+  jogador2: novoJogador(),
+  jogador3: novoJogador()
+};
