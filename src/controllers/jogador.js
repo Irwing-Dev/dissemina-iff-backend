@@ -4,7 +4,7 @@ const logIn = (req, res) => {
   res.json({ mensagem: 'Login endpoint ativo. Envie dados via POST se necessário.' })
 }
 
-// 📜 Retorna estado atual do jogador
+// Retorna estado atual do jogador
 const jogador = (req, res) => {
   const jogador = personagens[String(req.params.jogador)]
   if (!jogador) return res.status(404).json({ erro: 'Jogador não encontrado' })
@@ -14,12 +14,13 @@ const jogador = (req, res) => {
     passoAtual: jogador.passoAtual,
     votacaoAtual: jogador.votacaoAtual,
     votacaoAberta: jogador.votacaoAberta,
+    rolagemAberta: jogador.rolagemAberta,
     resultadoVotacao: jogador.mensagemVotacao,
     jogador: req.params.jogador
   })
 }
 
-// 🎲 Rola todos os dados
+// Rola todos os dados
 const full = (req, res) => {
   const jogador = personagens[String(req.params.jogador)]
   if (!jogador) return res.status(404).json({ erro: 'Jogador não encontrado' })
@@ -59,7 +60,7 @@ const full = (req, res) => {
   }
 }
 
-// 🗳️ Retorna opções de votação
+// Retorna opções de votação
 const votacao = (req, res) => {
   const jogador = personagens[String(req.params.jogador)]
   if (!jogador) return res.status(404).json({ erro: 'Jogador não encontrado' })
@@ -78,7 +79,7 @@ const votacao = (req, res) => {
   }
 }
 
-// ✅ Registrar voto
+// Registrar voto
 const depositaVoto = (req, res) => {
   const jogador = personagens[String(req.params.jogador)]
   if (!jogador) return res.status(404).json({ erro: 'Jogador não encontrado' })
