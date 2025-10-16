@@ -31,15 +31,15 @@ const full = (req, res) => {
     const rollD10_2 = Math.floor(Math.random() * 10)
     
     jogador.d6[rollD6] += 1
-    rollD6 += 1
+    //rollD6 += 1
     jogador.rolagensD6++
     
     jogador.d10_1[rollD10_1] += 1
-    rollD10_1 += 1
+    //rollD10_1 += 1
     jogador.rolagensD10_1++
     
     jogador.d10_2[rollD10_2] += 1
-    rollD10_2 += 1
+    //rollD10_2 += 1
     jogador.rolagensD10_2++
 
     const resultado = {
