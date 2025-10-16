@@ -26,9 +26,9 @@ const full = (req, res) => {
   if (!jogador) return res.status(404).json({ erro: 'Jogador não encontrado' })
 
   if (jogador.rolagemAberta) {
-    const rollD6 = Math.floor(Math.random() * 6)
-    const rollD10_1 = Math.floor(Math.random() * 10)
-    const rollD10_2 = Math.floor(Math.random() * 10)
+    const rollD6 = Math.floor(Math.random() * 6) + 1
+    const rollD10_1 = Math.floor(Math.random() * 10) + 1
+    const rollD10_2 = Math.floor(Math.random() * 10) + 1
     
     jogador.d6[rollD6 - 1] += 1
     //rollD6 += 1
