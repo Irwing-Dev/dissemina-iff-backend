@@ -97,37 +97,16 @@ const depositaVoto = (req, res) => {
   for (let opcao in jogador.opcoes) {
     if (voto == jogador.opcoes[opcao]) {
         jogador.votacao[opcao]++
+      }
     }
-  }
-
+    
+  jogador.votosTotal++
   jogador.votacaoAtual++
 
-  res.json({mensagem: "Voto computado com sucesso", jogador: req.params.jogador, votacaoAtual: jogador.votacaoAtual})
-  
-  //const voto = req.params.voto
-  //let votoValido = false
-
-  //for (let i = 0; i < jogador.opcoes.length; i++) {
-   // if (voto === jogador.opcoes[i]) {
-   //   jogador.votacao[i]++
-    //  jogador.votacaoAtual++
-  //    votoValido = true
-   //   break
-   // }
-//  }
-
-  //if (votoValido) {
-   // res.json({
-  //    mensagem: 'Voto computado com sucesso.',
- //     jogador: req.params.jogador,
- //     votacaoAtual: jogador.votacaoAtual
-   // })
- // } else {
-  //  res.status(400).json({
-  //    erro: 'Opção de voto inválida.',
-  //    jogador: req.params.jogador
-  //  })
-//  }
+  res.json({mensagem: "Voto computado com sucesso", 
+    jogador: req.params.jogador, 
+    votacaoAtual: jogador.votacaoAtual
+  })
 }
 
 export default {
