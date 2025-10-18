@@ -72,7 +72,12 @@ const esperaVotacao = (req, res) => {
 }
 
 const votacaoEstado = (req, res) => {
-    res.json({ votosTotal: personagens[String(req.params.jogador)].votosTotal })
+    const jogador = personagens[String(req.params.jogador)]
+    const result = jogador.opcoes.map((opcao, index) => ({
+        opcao,
+        votos: jogador.votacao[index]
+    }))
+    res.json({ votosTotal: jogador.votosTotal, result })
 }
 
 export default {
