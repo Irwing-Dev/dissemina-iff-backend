@@ -68,6 +68,7 @@ const esperaVotacao = (req, res) => {
     }
 
     personagens[String(req.params.jogador)].votacaoAtual = 0
+    personagens[String(req.params.jogador)].votosTotal = 0
     res.json({jogador: req.params.jogador})
 }
 
