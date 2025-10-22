@@ -1,8 +1,8 @@
 import { personagens } from './global.js';
 
-const logIn = (req, res) => {
-  res.json({ mensagem: 'Login endpoint ativo. Envie dados via POST se necessário.' })
-}
+// const logIn = (req, res) => {
+//   res.json({ mensagem: 'Login endpoint ativo. Envie dados via POST se necessário.' })
+// }
 
 // Retorna estado atual do jogador
 const jogador = (req, res) => {
@@ -10,9 +10,6 @@ const jogador = (req, res) => {
   if (!jogador) return res.status(404).json({ erro: 'Jogador não encontrado' })
 
   res.json({
-    nomeDado: 'Dados',
-    passoAtual: jogador.passoAtual,
-    votacaoAtual: jogador.votacaoAtual,
     votacaoAberta: jogador.votacaoAberta,
     rolagemAberta: jogador.rolagemAberta,
     resultadoVotacao: jogador.mensagemVotacao,
@@ -20,44 +17,46 @@ const jogador = (req, res) => {
   })
 }
 
+const rollDice = (sides, player= null) => {
+  const roll = Math.floor(Math.random() * sides) +1;
+  // em algum momento receber o player aqui para guardar as rolagens
+  return roll;
+}
+
 // Rola todos os dados
-const full = (req, res) => {
+const rollAll = (req, res) => {
   const jogador = personagens[String(req.params.jogador)]
   if (!jogador) return res.status(404).json({ erro: 'Jogador não encontrado' })
 
   if (jogador.rolagemAberta) {
-    const rollD6 = Math.floor(Math.random() * 6) + 1
-    const rollD10_1 = Math.floor(Math.random() * 10) + 1
-    const rollD10_2 = Math.floor(Math.random() * 10) + 1
+    const rollAcao = rollDice(20);
+    jogador.dado_acao[rollAcao - 1]++;
+    jogador.numRolagens
+
+    // jogador.d6[rollD6 - 1] += 1
+    // //rollD6 += 1
+    // jogador.rolagensD6++
     
-    jogador.d6[rollD6 - 1] += 1
-    //rollD6 += 1
-    jogador.rolagensD6++
+    // jogador.d10_1[rollD10_1 - 1] += 1
+    // //rollD10_1 += 1
+    // jogador.rolagensD10_1++
     
-    jogador.d10_1[rollD10_1 - 1] += 1
-    //rollD10_1 += 1
-    jogador.rolagensD10_1++
-    
-    jogador.d10_2[rollD10_2 - 1] += 1
-    //rollD10_2 += 1
-    jogador.rolagensD10_2++
+    // jogador.d10_2[rollD10_2 - 1] += 1
+    // //rollD10_2 += 1
+    // jogador.rolagensD10_2++
+
 
     const resultado = {
-      D6: rollD6,
-      D10_1: rollD10_1,
-      D10_2: rollD10_2
+      dado_acao: rollAcao,
+      numRolagens: jogador.numRolagens
     }
-
-    const resolucao = jogador.resolucaoIronsworn(rollD6, rollD10_1, rollD10_2)
 
     res.json({
       dado: 'full',
       resultado,
-      resolucao,
-      rolagem: jogador.rolagensD6,
-      passoAtual: jogador.passoAtual,
+      rolagem: jogador.dado_acao,
       votacaoAberta: jogador.votacaoAberta,
-      votacaoAtual: jogador.votacaoAtual,
+      votacaoAtual: jogador.votacaoTotal,
       jogador: req.params.jogador
     })
   } else {
@@ -110,9 +109,9 @@ const depositaVoto = (req, res) => {
 }
 
 export default {
-  logIn,
+  // logIn,
   jogador,
-  full,
+  rollAll,
   votacao, 
   depositaVoto
 }

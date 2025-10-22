@@ -3,20 +3,21 @@ class Jogador {
       opcoesPadrao = ["Ataque meelee", "Ataque ranged", "Usar item", "Fugir"]
     ) {
     this.dado_acao = Array(20).fill(0),
-    this.numRolagensAcao = 0
+    this.numRolagens= 0
 
     this.rolagemAberta = false;
     this.votacaoAberta = false;
 
+    this.mensagemVotacao = ""
     this.votacao = [];
     this.opcoes = [];
     this.opcoesPadrao = opcoesPadrao;
     this.votosTotal = 0;
   }
 
-  resetaDado(dado, lados) {
+  resetaDado(dado) {
     if (!Array.isArray(dado)) return;
-    for (let i = 0; i < lados; i++) {
+    for (let i = 0; i < dado.length; i++) {
       dado[i] = 0;
     }
   }
