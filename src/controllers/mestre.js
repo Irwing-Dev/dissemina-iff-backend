@@ -1,4 +1,4 @@
-import { personagens } from './global.js';
+import { personagens } from '../models/Jogadores.js';
 
 //rotas do mestre para dados
 const iniciaRolagens = (req, res) => {
@@ -31,10 +31,10 @@ const exibeRolagem = (req, res) => {
 
 //rotas do mestre para escolhas
 
-const esperaVotacao = (req, res) => {
+const criaVotacao = (req, res) => {
     const jogador = personagens[String(req.params.jogador)];
     jogador.votacaoAberta = true;
-    jogador.opcoes = req.body.opcao
+    jogador.opcoes = req.body.opcoes
 
     for(let i=0; i<jogador.opcoes.length; i++) {
         jogador.votacao[i] = 0
@@ -56,6 +56,6 @@ const votacaoEstado = (req, res) => {
 export default {
     iniciaRolagens,
     exibeRolagem,
-    esperaVotacao,
+    criaVotacao,
     votacaoEstado
 }

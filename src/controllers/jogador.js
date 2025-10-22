@@ -1,8 +1,9 @@
-import { personagens } from './global.js';
+import { personagens } from '../models/Jogadores.js';
 
 // const logIn = (req, res) => {
 //   res.json({ mensagem: 'Login endpoint ativo. Envie dados via POST se necessário.' })
 // }
+
 
 // Retorna estado atual do jogador
 const jogador = (req, res) => {
@@ -28,43 +29,41 @@ const rollAll = (req, res) => {
   const jogador = personagens[String(req.params.jogador)]
   if (!jogador) return res.status(404).json({ erro: 'Jogador não encontrado' })
 
-  if (jogador.rolagemAberta) {
-    const rollAcao = rollDice(20);
-    jogador.dado_acao[rollAcao - 1]++;
-    jogador.numRolagens
+  if (!jogador.rolagemAberta){
+      return res.status(403).json({
+        mensagem: 'Rolagem de dados bloqueada pelo mestre do jogo.',
+        jogador: req.params.jogador
+      })
+  } 
+  
+  const rollAcao = rollDice(20);
+  jogador.dado_acao[rollAcao - 1]++;
+  jogador.numRolagens
 
-    // jogador.d6[rollD6 - 1] += 1
-    // //rollD6 += 1
-    // jogador.rolagensD6++
-    
-    // jogador.d10_1[rollD10_1 - 1] += 1
-    // //rollD10_1 += 1
-    // jogador.rolagensD10_1++
-    
-    // jogador.d10_2[rollD10_2 - 1] += 1
-    // //rollD10_2 += 1
-    // jogador.rolagensD10_2++
+  // jogador.d6[rollD6 - 1] += 1
+  // //rollD6 += 1
+  // jogador.rolagensD6++
+  
+  // jogador.d10_1[rollD10_1 - 1] += 1
+  // //rollD10_1 += 1
+  // jogador.rolagensD10_1++
+  
+  // jogador.d10_2[rollD10_2 - 1] += 1
+  // //rollD10_2 += 1
+  // jogador.rolagensD10_2++
 
 
-    const resultado = {
-      dado_acao: rollAcao,
-      numRolagens: jogador.numRolagens
-    }
-
-    res.json({
-      dado: 'full',
-      resultado,
-      rolagem: jogador.dado_acao,
-      votacaoAberta: jogador.votacaoAberta,
-      votacaoAtual: jogador.votacaoTotal,
-      jogador: req.params.jogador
-    })
-  } else {
-    res.status(403).json({
-      mensagem: 'Rolagem de dados bloqueada pelo mestre do jogo.',
-      jogador: req.params.jogador
-    })
+  const resultado = {
+    dado_acao: rollAcao,
+    numRolagens: jogador.numRolagens,
+    rolagens: jogador.dado_acao,
   }
+
+  return res.json({
+    resultado,
+    jogador: req.params.jogador
+  })
+
 }
 
 // Retorna opções de votação
@@ -73,17 +72,17 @@ const votacao = (req, res) => {
   if (!jogador) return res.status(404).json({ erro: 'Jogador não encontrado' })
 
   if (jogador.votacaoAberta) {
-    res.json({
+    return res.json({
       jogador: req.params.jogador,
       opcoes: jogador.opcoes,
       votacaoAberta: true
     })
-  } else {
-    res.json({
-      jogador: req.params.jogador,
-      mensagem: 'Nenhuma votação ativa.'
-    })
   }
+    
+  return res.json({
+    jogador: req.params.jogador,
+    mensagem: 'Nenhuma votação ativa.'
+  });
 }
 
 // Registrar voto
@@ -100,11 +99,10 @@ const depositaVoto = (req, res) => {
     }
     
   jogador.votosTotal++
-  jogador.votacaoAtual++
 
   res.json({mensagem: "Voto computado com sucesso", 
     jogador: req.params.jogador, 
-    votacaoAtual: jogador.votacaoAtual
+    votosTotal: jogador.votosTotal
   })
 }
 
