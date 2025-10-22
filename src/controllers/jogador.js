@@ -1,8 +1,12 @@
+import { Dado } from '../models/Dado.js';
 import { personagens } from '../models/Jogadores.js';
 
 // const logIn = (req, res) => {
 //   res.json({ mensagem: 'Login endpoint ativo. Envie dados via POST se necessário.' })
 // }
+
+
+
 
 
 // Retorna estado atual do jogador
@@ -18,14 +22,11 @@ const jogador = (req, res) => {
   })
 }
 
-const rollDice = (sides, player= null) => {
-  const roll = Math.floor(Math.random() * sides) +1;
-  // em algum momento receber o player aqui para guardar as rolagens
-  return roll;
-}
+// delayzinho
+const delay =(delay) => new Promise(resolve => setTimeout(resolve, delay))
 
 // Rola todos os dados
-const rollAll = (req, res) => {
+const rollAll = async(req, res) => {
   const jogador = personagens[String(req.params.jogador)]
   if (!jogador) return res.status(404).json({ erro: 'Jogador não encontrado' })
 
@@ -36,31 +37,32 @@ const rollAll = (req, res) => {
       })
   } 
   
-  const rollAcao = rollDice(20);
-  jogador.dado_acao[rollAcao - 1]++;
-  jogador.numRolagens
+  await delay(1000);
 
-  // jogador.d6[rollD6 - 1] += 1
-  // //rollD6 += 1
-  // jogador.rolagensD6++
-  
-  // jogador.d10_1[rollD10_1 - 1] += 1
-  // //rollD10_1 += 1
-  // jogador.rolagensD10_1++
-  
-  // jogador.d10_2[rollD10_2 - 1] += 1
-  // //rollD10_2 += 1
-  // jogador.rolagensD10_2++
+  const rollAcao = jogador.dado_acao.roll();
+  const resultados = []
 
-
-  const resultado = {
-    dado_acao: rollAcao,
-    numRolagens: jogador.numRolagens,
-    rolagens: jogador.dado_acao,
+  if(jogador.dados) {
+    jogador.dados.forEach(dado => {
+      resultados.push({
+        name: dado.name, 
+        todas_rolagem: dado.rolagem, 
+        rolagem_atual:dado.roll()
+      });
+    });
   }
 
-  return res.json({
-    resultado,
+
+  jogador.numRolagens++
+
+  const resultado_acao = {
+    rolagem_atual: rollAcao,
+    todas_rolagens: jogador.dado_acao.rolagem,
+  }
+
+  return res.json({ 
+    resultados,
+    resultado_acao,
     jogador: req.params.jogador
   })
 

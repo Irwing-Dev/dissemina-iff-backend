@@ -1,9 +1,12 @@
+import { Dado } from "./Dado.js";
 class Jogador {
   constructor(
       opcoesPadrao = ["Ataque meelee", "Ataque ranged", "Usar item", "Fugir"]
     ) {
-    this.dado_acao = Array(20).fill(0),
+    this.dado_acao = new Dado(20, 1, "Dado de Ação"),
     this.numRolagens= 0
+
+    this.dados = [];
 
     this.rolagemAberta = false;
     this.votacaoAberta = false;
@@ -13,28 +16,6 @@ class Jogador {
     this.opcoes = [];
     this.opcoesPadrao = opcoesPadrao;
     this.votosTotal = 0;
-  }
-
-  resetaDado(dado) {
-    if (!Array.isArray(dado)) return;
-    for (let i = 0; i < dado.length; i++) {
-      dado[i] = 0;
-    }
-  }
-
-  moda(dado) {
-    if (!Array.isArray(dado) || dado.length === 0) return 0;
-    let resultado = 0;
-    let check = 0;
-
-    for (let i = 0; i < dado.length; i++) {
-      if (dado[i] >= check) {
-        check = dado[i];
-        resultado = i;
-      }
-    }
-    resultado++;
-    return resultado
   }
 }
 

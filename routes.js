@@ -9,7 +9,7 @@ const route = express.Router()
 // route.get('/', jogador.logIn)
 
 //rotas do mestre para dados
-route.post('/mestre/:jogador/exibeRolagem', mestre.exibeRolagem)
+route.get('/mestre/:jogador/exibeRolagem', mestre.exibeRolagem)
 route.post('/mestre/:jogador/iniciaRolagens', mestre.iniciaRolagens)
 
 //rotas do mestre para escolhas
