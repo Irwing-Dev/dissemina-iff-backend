@@ -60,15 +60,18 @@ const criaVotacao = (req, res) => {
 }
 
 const esperaVotacao = (req, res) => {
-    personagens[String(req.params.jogador)].votacaoAberta = true
-    personagens[String(req.params.jogador)].opcoes = req.body.opcao
+    const jogador = personagens[String(req.params.jogador)]
+    jogador.votacaoAberta = true
+    jogador.opcoes = req.body.opcao
 
-    for(let i=0; i<personagens[String(req.params.jogador)].opcoes.length; i++) {
-        personagens[String(req.params.jogador)].votacao[i] = 0
+    if (jogador.opcoes.length == 0) throw new Error("Sem opcoes")
+
+    for(let i = 0; i < jogador.opcoes.length; i++) {
+        jogador.votacao[i] = 0
     }
 
-    personagens[String(req.params.jogador)].votacaoAtual = 0
-    personagens[String(req.params.jogador)].votosTotal = 0
+    jogador.votacaoAtual = 0
+    jogador.votosTotal = 0
     res.json({jogador: req.params.jogador})
 }
 
