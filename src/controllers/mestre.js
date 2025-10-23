@@ -28,6 +28,10 @@ const votacaoMaisDado = (req, res) => {
         op.name, 
         new Dado(op.dado.lados, op.dado.quantidade, op.dado.name, op.dado.bonus | 0),
     ));
+    for(let i = 0; i < jogador.opcoesComDado.length; i++) {
+        jogador.opcoes[i] = 0
+    }
+    jogador.votosTotal = 0
     return res.status(200).json({jogador: key});
 }
 
@@ -84,9 +88,9 @@ const criaVotacao = (req, res) => {
 
 const votacaoEstado = (req, res) => {
     const jogador = personagens[String(req.params.jogador)]
-    const result = jogador.opcoes.map((opcao, index) => ({
-        opcao,
-        votos: jogador.votacao[index]
+    const result = jogador.opcoes.map((op, index) => ({
+        name: jogador.opcoesComDado[index].name,
+        votos: jogador.opcoes[index]
     }))
     res.json({ votosTotal: jogador.votosTotal, result })
 }

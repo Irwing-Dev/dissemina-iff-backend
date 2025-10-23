@@ -4,8 +4,7 @@ export class Dado {
         this.quantidade = quantidade;
         this.rolagem = Array(lados).fill(0);
         this.name = name;
-        this.bonus = bonus
-        this.dados
+        this.bonus = bonus;
     }
 
     roll() {

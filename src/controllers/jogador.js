@@ -79,17 +79,26 @@ const depositaVotoComDado = (req, res) => {
 
     let rolada;
     
-  for(let i = 0; i< jogador.opcoesComDado.length; i++) {
-    console.log(jogador.opcoesComDado[i].name)
-
+  for(let i = 0; i < jogador.opcoesComDado.length; i++) {
       if(jogador.opcoesComDado[i].name == voto) {
         rolada = jogador.opcoesComDado[i].dado.roll();
         console.log(rolada);
+        jogador.votosTotal++
         break;
       }
   }
+
+  for (let opcao in jogador.opcoesComDado) {
+    console.log(jogador.opcoesComDado[opcao])
+    if (voto == jogador.opcoesComDado[opcao].name) {
+      jogador.opcoes[opcao]++
+    }
+  }
+
+  let votos = jogador.opcoes.find((opcao, index) => jogador.opcoesComDado[index]?.name === voto) || 0;
+  
   console.log("Passou aqui esta desgraça: " + rolada);
-  return res.status(200).json({valorRolagem: rolada});
+  return res.status(200).json({valorRolagem: rolada, votos: votos});
 }
 
 
