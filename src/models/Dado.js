@@ -5,6 +5,7 @@ export class Dado {
         this.rolagem = Array(lados).fill(0);
         this.name = name;
         this.bonus = bonus
+        this.dados
     }
 
     roll() {

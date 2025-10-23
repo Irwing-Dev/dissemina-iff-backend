@@ -22,6 +22,7 @@ const jogador = (req, res) => {
   })
 }
 
+
 // delayzinho
 const delay =(delay) => new Promise(resolve => setTimeout(resolve, delay))
 
@@ -69,6 +70,29 @@ const rollAll = async(req, res) => {
 }
 
 // Retorna opções de votação
+
+const depositaVotoComDado = (req, res) => {
+  const voto = req.params.voto;
+  const jogador = personagens[String(req.params.jogador)]
+  if (!jogador) return res.status(404).json({ erro: 'Jogador não encontrado' })
+  if(!voto) return res.status(400).json({message: "Não enviou o voto paisão"})
+
+    let rolada;
+    
+  for(let i = 0; i< jogador.opcoesComDado.length; i++) {
+    console.log(jogador.opcoesComDado[i].name)
+
+      if(jogador.opcoesComDado[i].name == voto) {
+        rolada = jogador.opcoesComDado[i].dado.roll();
+        console.log(rolada);
+        break;
+      }
+  }
+  console.log("Passou aqui esta desgraça: " + rolada);
+  return res.status(200).json({valorRolagem: rolada});
+}
+
+
 const votacao = (req, res) => {
   const jogador = personagens[String(req.params.jogador)]
   if (!jogador) return res.status(404).json({ erro: 'Jogador não encontrado' })
@@ -113,5 +137,6 @@ export default {
   jogador,
   rollAll,
   votacao, 
-  depositaVoto
+  depositaVoto,
+  depositaVotoComDado
 }

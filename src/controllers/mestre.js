@@ -1,5 +1,6 @@
 import { personagens } from '../models/Jogadores.js';
 import { Dado } from "../models/Dado.js"
+import { OpcaoComDado } from '../models/OpcaoComDado.js';
 
 //rotas do mestre para dados
 const iniciaRolagens = (req, res) => {
@@ -16,6 +17,18 @@ const iniciaRolagens = (req, res) => {
     jogador.rolagemAberta = true;
 
     return res.json({ jogador: key });
+}
+
+const votacaoMaisDado = (req, res) => {
+    const key = String(req.params.jogador);
+    const jogador = personagens[key];
+    if (!jogador) return res.status(404).json({ error: 'Jogador não encontrado' });
+
+    jogador.opcoesComDado = req.body.opcoes.map((op, index) => new OpcaoComDado(
+        op.name, 
+        new Dado(op.dado.lados, op.dado.quantidade, op.dado.name, op.dado.bonus | 0),
+    ));
+    return res.status(200).json({jogador: key});
 }
 
 const exibeRolagem = (req, res) => {
@@ -82,5 +95,6 @@ export default {
     iniciaRolagens,
     exibeRolagem,
     criaVotacao,
-    votacaoEstado
+    votacaoEstado,
+    votacaoMaisDado
 }

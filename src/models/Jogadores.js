@@ -14,6 +14,7 @@ class Jogador {
     this.mensagemVotacao = ""
     this.votacao = [];
     this.opcoes = [];
+    this.opcoesComDado = []
     this.opcoesPadrao = opcoesPadrao;
     this.votosTotal = 0;
   }
