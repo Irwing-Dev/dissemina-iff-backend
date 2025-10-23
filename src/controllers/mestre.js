@@ -28,10 +28,13 @@ const votacaoMaisDado = (req, res) => {
         op.name, 
         new Dado(op.dado.lados, op.dado.quantidade, op.dado.name, op.dado.bonus | 0),
     ));
+
+
     for(let i = 0; i < jogador.opcoesComDado.length; i++) {
-        jogador.opcoes[i] = 0
+        jogador.votacao[i] = 0
     }
     jogador.votosTotal = 0
+    jogador.votacaoAberta = true;
     return res.status(200).json({jogador: key});
 }
 
@@ -40,25 +43,29 @@ const exibeRolagem = (req, res) => {
     jogador.rolagemAberta = false;
 
     const acao = jogador.dado_acao.moda();
+    let mult = 1
+    if(acao == jogador.dado_acao.lados) {
+        mult = 2
+    }
     const bonus = jogador.dado_acao.bonus | 0
-    const totalNumerico = acao + bonus;
     const modas = [
         {
             name: jogador.dado_acao.name,
             valor: acao,
             bonus: bonus,
-            total: `${acao} + ${bonus} = ${totalNumerico}`
+            mult: mult,
         }
     ]
 
     if(jogador.dados) {
         jogador.dados.forEach(dado => {
             const valor = dado.moda();
+
             modas.push({
                 name: dado.name, 
                 valor: valor, 
                 bonus: dado.bonus | 0,
-                total: `${valor} + ${dado.bonus} = ${valor+dado.bonus}`
+                mult: mult,
             })
         });
     }
@@ -77,6 +84,7 @@ const criaVotacao = (req, res) => {
     const jogador = personagens[String(req.params.jogador)];
     jogador.votacaoAberta = true;
     jogador.opcoes = req.body.opcoes
+    
 
     for(let i=0; i<jogador.opcoes.length; i++) {
         jogador.votacao[i] = 0
@@ -88,10 +96,17 @@ const criaVotacao = (req, res) => {
 
 const votacaoEstado = (req, res) => {
     const jogador = personagens[String(req.params.jogador)]
-    const result = jogador.opcoes.map((op, index) => ({
-        name: jogador.opcoesComDado[index].name,
-        votos: jogador.opcoes[index]
+    let opcoesComDado = jogador.opcoesComDado;
+    let opcoes =  opcoesComDado ? opcoesComDado: jogador.opcoes 
+
+    const result = opcoes.map((op, index) => ({
+        name: op.name,
+        votos: jogador.votacao[index],
+        moda: opcoesComDado ? opcoesComDado[index].dado.moda() : undefined
     }))
+    jogador.opcoesComDado = undefined
+    jogador.opcoes = undefined
+    jogador.votacaoAberta = false
     res.json({ votosTotal: jogador.votosTotal, result })
 }
 

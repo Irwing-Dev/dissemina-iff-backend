@@ -24,8 +24,11 @@ function novoJogador(opcoesPadrao = []) {
   return new Jogador(opcoesPadrao);
 }
 
+// Apenas para efeito de teste, pode apagar
+const acoesGerais = ["Atacar meelee", "Atacar ranged", "Usar Item", "Fugir"]
+
 export const personagens = {
-  jogador1: novoJogador(),
-  jogador2: novoJogador(),
-  jogador3: novoJogador()
+  jogador1: novoJogador(acoesGerais),
+  jogador2: novoJogador(acoesGerais),
+  jogador3: novoJogador(acoesGerais)
 };

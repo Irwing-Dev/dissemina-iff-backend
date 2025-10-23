@@ -41,6 +41,7 @@ const rollAll = async(req, res) => {
   await delay(1000);
 
   const rollAcao = jogador.dado_acao.roll();
+  console.log("passou acao")
   const resultados = []
 
   if(jogador.dados) {
@@ -78,26 +79,18 @@ const depositaVotoComDado = (req, res) => {
   if(!voto) return res.status(400).json({message: "Não enviou o voto paisão"})
 
     let rolada;
-    
+    let votos;
   for(let i = 0; i < jogador.opcoesComDado.length; i++) {
       if(jogador.opcoesComDado[i].name == voto) {
         rolada = jogador.opcoesComDado[i].dado.roll();
-        console.log(rolada);
+
+        jogador.votacao[i]++
+        votos = jogador.votacao[i];
         jogador.votosTotal++
         break;
       }
   }
-
-  for (let opcao in jogador.opcoesComDado) {
-    console.log(jogador.opcoesComDado[opcao])
-    if (voto == jogador.opcoesComDado[opcao].name) {
-      jogador.opcoes[opcao]++
-    }
-  }
-
-  let votos = jogador.opcoes.find((opcao, index) => jogador.opcoesComDado[index]?.name === voto) || 0;
   
-  console.log("Passou aqui esta desgraça: " + rolada);
   return res.status(200).json({valorRolagem: rolada, votos: votos});
 }
 
@@ -110,6 +103,8 @@ const votacao = (req, res) => {
     return res.json({
       jogador: req.params.jogador,
       opcoes: jogador.opcoes,
+      opcoesComDado: jogador.opcoesComDado,
+      opcoesPadrao: jogador.opcoesPadrao,
       votacaoAberta: true
     })
   }
@@ -127,9 +122,9 @@ const depositaVoto = (req, res) => {
 
   const voto = req.params.voto
   
-  for (let opcao in jogador.opcoes) {
-    if (voto == jogador.opcoes[opcao]) {
-        jogador.votacao[opcao]++
+  for (let i in jogador.opcoes) {
+    if (voto == jogador.opcoes[i].name) {
+        jogador.votacao[i]++
       }
     }
     

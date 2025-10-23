@@ -23,7 +23,7 @@ route.get('/jogador/:jogador', jogador.jogador);
 route.get('/jogador/:jogador/rolaTodos', jogador.rollAll);
 
 //rotas do jogador para escolhas
-route.post('/jogador/:jogador/votacao', jogador.votacao);
+route.get('/jogador/:jogador/votacao', jogador.votacao);
 route.post('/jogador/:jogador/votacao/:voto', jogador.depositaVoto);
 route.post('/jogador/:jogador/votacaoComDado/:voto', jogador.depositaVotoComDado);
 
