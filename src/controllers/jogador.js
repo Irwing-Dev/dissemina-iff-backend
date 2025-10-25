@@ -119,16 +119,20 @@ const votacao = (req, res) => {
 const depositaVoto = (req, res) => {
   const jogador = personagens[String(req.params.jogador)]
   if (!jogador) return res.status(404).json({ erro: 'Jogador não encontrado' })
+  if (jogador.jaVotou) return res.status(403).json({ erro: "Você já votou nessa rodada!" });
 
   const voto = req.params.voto
   
-  for (let i in jogador.opcoes) {
-    if (voto == jogador.opcoes[i].name) {
+  // O output vai mudar a exibição das opções se o voto for com dado ou sem
+  for (let i = 0; i < jogador.opcoes.length; i++) {
+    if (voto == jogador.opcoes[i]) {
         jogador.votacao[i]++
+        break;
       }
     }
     
   jogador.votosTotal++
+  jogador.jaVotou = true
 
   res.json({mensagem: "Voto computado com sucesso", 
     jogador: req.params.jogador, 

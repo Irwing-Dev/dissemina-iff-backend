@@ -91,6 +91,7 @@ const criaVotacao = (req, res) => {
         jogador.votacao[i] = 0
     }
 
+    jogador.jaVotou = false
     jogador.votosTotal = 0
     res.json({jogador: req.params.jogador})
 }
@@ -98,17 +99,18 @@ const criaVotacao = (req, res) => {
 const votacaoEstado = (req, res) => {
     const jogador = personagens[String(req.params.jogador)]
     let opcoesComDado = jogador.opcoesComDado;
-    let opcoes =  opcoesComDado ? opcoesComDado: jogador.opcoes 
+    let opcoes =  opcoesComDado ? opcoesComDado : jogador.opcoes 
 
     const result = opcoes.map((op, index) => ({
-        name: op.name,
+        name: typeof op === 'object' && op !== null ? op.name : op,
         votos: jogador.votacao[index],
         moda: opcoesComDado ? opcoesComDado[index].dado.moda() : undefined
     }))
     jogador.opcoesComDado = undefined
     jogador.opcoes = undefined
     jogador.votacaoAberta = false
-    res.json({ votosTotal: jogador.votosTotal, result })
+
+    return res.json({ votosTotal: jogador.votosTotal, result })
 }
 
 // Registrar vida do jogador - Faz mais sentido o mestre/assistente-do-jogador registrar essa parte já que ele vai 'controlar o personagem'
