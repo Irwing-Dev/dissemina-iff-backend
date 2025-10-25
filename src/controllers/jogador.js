@@ -115,15 +115,21 @@ const votacao = (req, res) => {
   });
 }
 
-// Registrar voto
 const depositaVoto = (req, res) => {
   const jogador = personagens[String(req.params.jogador)]
   if (!jogador) return res.status(404).json({ erro: 'Jogador não encontrado' })
 
-  const voto = req.params.voto
+  const voto = req.params.voto;
+  const uid = req.body.uid;
+
+  if (!Array.isArray(jogador.votantes)) jogador.votantes = [];
+  if (jogador.votantes.includes(uid)) {
+    return res.status(403).json({ erro: "Você já votou nessa rodada!"});
+  }
+  jogador.votantes.push(uid);
   
   for (let i in jogador.opcoes) {
-    if (voto == jogador.opcoes[i].name) {
+    if (voto == jogador.opcoes[i]) {  
         jogador.votacao[i]++
       }
     }
