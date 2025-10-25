@@ -69,14 +69,12 @@ const rollAll = async(req, res) => {
 
 // Retorna opções de votação
 
+// Vota nas opções com rolagem de dado
 const depositaVotoComDado = (req, res) => {
   const voto = req.params.voto;
   const jogador = personagens[String(req.params.jogador)]
   if (!jogador) return res.status(404).json({ erro: 'Jogador não encontrado' })
-  if (!voto) return res.status(400).json({message: "Não enviou o voto paisão"})
-  if (jogador.jaVotou) return res.status(403).json({ erro: "Você já votou nessa rodada!" });
-  
-  jogador.jaVotou = true;
+  if (!voto) return res.status(400).json({message: "Não enviou o voto paisão"})  
 
     let rolada;
     let votos;
@@ -94,7 +92,7 @@ const depositaVotoComDado = (req, res) => {
   return res.status(200).json({valorRolagem: rolada, votos: votos});
 }
 
-
+// Mostra a votação atual
 const votacao = (req, res) => {
   const jogador = personagens[String(req.params.jogador)]
   if (!jogador) return res.status(404).json({ erro: 'Jogador não encontrado' })
@@ -115,6 +113,7 @@ const votacao = (req, res) => {
   });
 }
 
+// Vota nas opções sem dado
 const depositaVoto = (req, res) => {
   const jogador = personagens[String(req.params.jogador)]
   if (!jogador) return res.status(404).json({ erro: 'Jogador não encontrado' })

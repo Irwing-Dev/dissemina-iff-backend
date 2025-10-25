@@ -10,8 +10,7 @@ class Jogador {
 
     this.rolagemAberta = false;
     this.votacaoAberta = false;
-    this.jaVotou = false
-
+    
    this.vidaAtual = 0
 
     this.mensagemVotacao = ""

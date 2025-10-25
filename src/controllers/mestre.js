@@ -8,15 +8,27 @@ const iniciaRolagens = (req, res) => {
     const jogador = personagens[key];
     if (!jogador) return res.status(404).json({ error: 'Jogador não encontrado' });
 
-    jogador.dado_acao.resetaRolagens();
-    jogador.numRolagens = 0;
-    if(req.body.dados) {
-        jogador.dados = req.body.dados.map((dado, index) => new Dado(dado.lados, dado.quantidade, dado.name, dado.bonus | 0));
+    if(req.body.dados && Array.isArray(req.body.dados)) {
+        jogador.dados = req.body.dados.map((dado, index) => {
+            const lados = dado.lados;
+            const quantidade = dado.quantidade;
+            const bonus = dado.bonus || 0;
+            const name = dado.name;
+
+            if (typeof lados !== 'number' || typeof quantidade !== 'number' || lados <= 0 || quantidade <= 0) {
+                 throw new Error(`Configuração de dado inválida: lados=${lados}, quantidade=${quantidade}`);
+            }
+
+            return new Dado(lados, quantidade, name, bonus);
+        });
+    } else {
+        jogador.dados = [];
     }
+    
     jogador.dado_acao.bonus = req.body.bonus_acao;
     jogador.rolagemAberta = true;
 
-    return res.json({ jogador: key });
+    return res.json({ jogador: key, dados: jogador.dados, bonus_rolagem: jogador.dado_acao.bonus });
 }
 
 const votacaoMaisDado = (req, res) => {
@@ -35,7 +47,6 @@ const votacaoMaisDado = (req, res) => {
     }
     jogador.votosTotal = 0
     jogador.votacaoAberta = true;
-    jogador.jaVotou = false;
     return res.status(200).json({jogador: key});
 }
 
@@ -118,7 +129,7 @@ const votacaoEstado = (req, res) => {
     jogador.votacaoAberta = false
 }
 
-// Registrar vida do jogador - Faz mais sentido o mestre/assistente-do-jogador registrar essa parte já que ele vai 'controlar o personagem'
+// Registrar vida do jogador
 const postVidaJogador = (req,res) => {
   console.log('Passei aqui')
   const jogador = personagens[String(req.params.jogador)];
