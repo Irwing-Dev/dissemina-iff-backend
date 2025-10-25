@@ -91,31 +91,26 @@ const criaVotacao = (req, res) => {
         jogador.votacao[i] = 0
     }
 
-    jogador.votosTotal = 0;
-    jogador.votantes = [];
+    jogador.jaVotou = false
+    jogador.votosTotal = 0
     res.json({jogador: req.params.jogador})
 }
 
 const votacaoEstado = (req, res) => {
     const jogador = personagens[String(req.params.jogador)]
-    
     let opcoesComDado = jogador.opcoesComDado;
-    // Verifica se opcoesComDado existe E tem elementos
-    let opcoes = (opcoesComDado && opcoesComDado.length > 0) ? opcoesComDado : jogador.opcoes
+    let opcoes =  opcoesComDado ? opcoesComDado : jogador.opcoes 
 
-    console.log('DEBUG - opcoes escolhidas:', opcoes)
-    
     const result = opcoes.map((op, index) => ({
-        name: op.name || op,  
-        votos: jogador.votacao[index] || 0,
-        moda: (opcoesComDado && opcoesComDado.length > 0) ? opcoesComDado[index]?.dado?.moda() : undefined
+        name: typeof op === 'object' && op !== null ? op.name : op,
+        votos: jogador.votacao[index],
+        moda: opcoesComDado ? opcoesComDado[index].dado.moda() : undefined
     }))
-    
-    res.json({ votosTotal: jogador.votosTotal, result })
-    
     jogador.opcoesComDado = undefined
-    jogador.opcoes = undefined      
+    jogador.opcoes = undefined
     jogador.votacaoAberta = false
+
+    return res.json({ votosTotal: jogador.votosTotal, result })
 }
 
 // Registrar vida do jogador - Faz mais sentido o mestre/assistente-do-jogador registrar essa parte já que ele vai 'controlar o personagem'
