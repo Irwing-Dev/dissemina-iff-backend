@@ -35,6 +35,7 @@ const votacaoMaisDado = (req, res) => {
     }
     jogador.votosTotal = 0
     jogador.votacaoAberta = true;
+    jogador.jaVotou = false;
     return res.status(200).json({jogador: key});
 }
 
@@ -110,10 +111,23 @@ const votacaoEstado = (req, res) => {
     res.json({ votosTotal: jogador.votosTotal, result })
 }
 
+// Registrar vida do jogador - Faz mais sentido o mestre/assistente-do-jogador registrar essa parte já que ele vai 'controlar o personagem'
+const postVidaJogador = (req,res) => {
+  console.log('Passei aqui')
+  const jogador = personagens[String(req.params.jogador)];
+  const vidaNova = req.body.vidaNova
+  jogador.vidaAtual = vidaNova;
+  return res.json({
+    vidaAtual:vidaNova
+  })
+}
+
+
 export default {
     iniciaRolagens,
     exibeRolagem,
     criaVotacao,
     votacaoEstado,
-    votacaoMaisDado
+    votacaoMaisDado,
+    postVidaJogador
 }

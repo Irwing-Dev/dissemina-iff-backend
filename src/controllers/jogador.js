@@ -5,12 +5,8 @@ import { personagens } from '../models/Jogadores.js';
 //   res.json({ mensagem: 'Login endpoint ativo. Envie dados via POST se necessário.' })
 // }
 
-
-
-
-
 // Retorna estado atual do jogador
-const jogador = (req, res) => {
+const player = (req, res) => {
   const jogador = personagens[String(req.params.jogador)]
   if (!jogador) return res.status(404).json({ erro: 'Jogador não encontrado' })
 
@@ -25,7 +21,7 @@ const jogador = (req, res) => {
 
 
 // delayzinho
-const delay =(delay) => new Promise(resolve => setTimeout(resolve, delay))
+const delay = (delay) => new Promise(resolve => setTimeout(resolve, delay))
 
 // Rola todos os dados
 const rollAll = async(req, res) => {
@@ -50,7 +46,7 @@ const rollAll = async(req, res) => {
       resultados.push({
         name: dado.name, 
         todas_rolagem: dado.rolagem, 
-        rolagem_atual:dado.roll()
+        rolagem_atual: dado.roll()
       });
     });
   }
@@ -77,20 +73,23 @@ const depositaVotoComDado = (req, res) => {
   const voto = req.params.voto;
   const jogador = personagens[String(req.params.jogador)]
   if (!jogador) return res.status(404).json({ erro: 'Jogador não encontrado' })
-  if(!voto) return res.status(400).json({message: "Não enviou o voto paisão"})
+  if (!voto) return res.status(400).json({message: "Não enviou o voto paisão"})
+  if (jogador.jaVotou) return res.status(403).json({ erro: "Você já votou nessa rodada!" });
+  
+  jogador.jaVotou = true;
 
     let rolada;
     let votos;
-  for(let i = 0; i < jogador.opcoesComDado.length; i++) {
-      if(jogador.opcoesComDado[i].name == voto) {
-        rolada = jogador.opcoesComDado[i].dado.roll();
+    for(let i = 0; i < jogador.opcoesComDado.length; i++) {
+        if(jogador.opcoesComDado[i].name == voto) {
+          rolada = jogador.opcoesComDado[i].dado.roll();
 
-        jogador.votacao[i]++
-        votos = jogador.votacao[i];
-        jogador.votosTotal++
-        break;
-      }
-  }
+          jogador.votacao[i]++
+          votos = jogador.votacao[i];
+          jogador.votosTotal++
+          break;
+        }
+    }
   
   return res.status(200).json({valorRolagem: rolada, votos: votos});
 }
@@ -137,29 +136,18 @@ const depositaVoto = (req, res) => {
   })
 }
 
-// Registrar vida do jogador
-const postVidaJogador = (req,res) => {
-  console.log('Passei aqui')
-  const jogador = personagens[String(req.params.jogador)];
-  const vidaNova = req.body.vidaNova
-  jogador.vidaAtual = vidaNova;
-  return res.json({
-    vidaAtual:vidaNova
-  })
-}
 // Mostrar vida do jogador
-const getVidaJogador = (req,res)=>{
+const getVidaJogador = (req,res) => {
   const jogador = personagens[String(req.params.jogador)];
   return res.json({vidaAtual:jogador.vidaAtual})
 }
 
 export default {
   // logIn,
-  jogador,
+  player,
   rollAll,
   votacao,
   depositaVoto,
   depositaVotoComDado,
-  postVidaJogador,
-  getVidaJogador,
+  getVidaJogador
 };

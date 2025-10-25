@@ -17,13 +17,16 @@ route.post('/mestre/:jogador/criaVotacao', mestre.criaVotacao);
 route.post('/mestre/:jogador/criaVotacaoComDado', mestre.votacaoMaisDado);
 route.get('/mestre/:jogador/exibeVotacao', mestre.votacaoEstado);
 
-//rota do mestre para vida
-route.get("/mestre/:jogador/vida", jogador.getVidaJogador);
-route.post("/mestre/:jogador/vida", jogador.postVidaJogador);
+//rota do mestre para atualizar/registrar a vida 
+route.post("/mestre/:jogador/vida", mestre.postVidaJogador);
+
+//rota do jogador para vida
+route.get("/jogador/:jogador/vida", jogador.getVidaJogador);
+// route.post("/mestre/:jogador/vida", mestre.postVidaJogador);
 
 //rotas do jogador para rolar dados
-route.post('/jogador/:jogador', jogador.jogador);
-route.get('/jogador/:jogador', jogador.jogador);
+route.post('/jogador/:jogador', jogador.player);
+route.get('/jogador/:jogador', jogador.player);
 route.get('/jogador/:jogador/rolaTodos', jogador.rollAll);
 
 //rotas do jogador para escolhas
@@ -31,7 +34,5 @@ route.get('/jogador/:jogador/votacao', jogador.votacao);
 route.post('/jogador/:jogador/votacao/:voto', jogador.depositaVoto);
 route.post('/jogador/:jogador/votacaoComDado/:voto', jogador.depositaVotoComDado);
 
-//rota do jogador para ver a vida 
-route.post("/jogador/:jogador/vida", jogador.postVidaJogador);
 
 export default route

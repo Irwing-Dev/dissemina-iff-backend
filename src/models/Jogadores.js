@@ -4,12 +4,13 @@ class Jogador {
       opcoesPadrao = ["Ataque meelee", "Ataque ranged", "Usar item", "Fugir"]
     ) {
     this.dado_acao = new Dado(20, 1, "Dado de Ação"),
-    this.numRolagens= 0
+    this.numRolagens = 0
 
     this.dados = [];
 
     this.rolagemAberta = false;
     this.votacaoAberta = false;
+    this.jaVotou = false
 
    this.vidaAtual = 0
 
