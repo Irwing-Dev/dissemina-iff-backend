@@ -18,7 +18,8 @@ const jogador = (req, res) => {
     votacaoAberta: jogador.votacaoAberta,
     rolagemAberta: jogador.rolagemAberta,
     resultadoVotacao: jogador.mensagemVotacao,
-    jogador: req.params.jogador
+    jogador: req.params.jogador,
+    vidaAtual:jogador.vidaAtual
   })
 }
 
@@ -136,11 +137,29 @@ const depositaVoto = (req, res) => {
   })
 }
 
+// Registrar vida do jogador
+const postVidaJogador = (req,res) => {
+  console.log('Passei aqui')
+  const jogador = personagens[String(req.params.jogador)];
+  const vidaNova = req.body.vidaNova
+  jogador.vidaAtual = vidaNova;
+  return res.json({
+    vidaAtual:vidaNova
+  })
+}
+// Mostrar vida do jogador
+const getVidaJogador = (req,res)=>{
+  const jogador = personagens[String(req.params.jogador)];
+  return res.json({vidaAtual:jogador.vidaAtual})
+}
+
 export default {
   // logIn,
   jogador,
   rollAll,
-  votacao, 
+  votacao,
   depositaVoto,
-  depositaVotoComDado
-}
+  depositaVotoComDado,
+  postVidaJogador,
+  getVidaJogador,
+};
