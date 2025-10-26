@@ -108,6 +108,12 @@ const criaVotacao = (req, res) => {
     res.json({jogador: req.params.jogador})
 }
 
+const getOpcoesSalvas = (req, res) => {
+    const jogador = personagens[String(req.params.jogador)]
+    if(!jogador) return res.status(400).json({"message": "jogador invalido"})
+    return res.status(200).json({opcoesSalvas: jogador.opcoesPadrao})
+}
+
 const votacaoEstado = (req, res) => {
     const jogador = personagens[String(req.params.jogador)]
     
@@ -120,6 +126,7 @@ const votacaoEstado = (req, res) => {
     const result = opcoes.map((op, index) => ({
         name: op.name,
         votos: jogador.votacao[index],
+        // Clean code é pros fracos coda-fofo
         rolagens: (op.dado && op.dado.length> 0) ? op.dado.map((d, index) => {return {name: d.name, moda: d.moda()}}) : null
     }))
 
@@ -127,6 +134,8 @@ const votacaoEstado = (req, res) => {
     jogador.opcoesComDado = undefined
     jogador.opcoes = undefined      
     jogador.votacaoAberta = false
+    opcoes.forEach(op => delete op.dado.forEach(d => delete d.rolagem))
+    jogador.opcoesPadrao.push(...opcoes)
     res.json({ votosTotal: jogador.votosTotal, result })
 }
 
@@ -148,5 +157,6 @@ export default {
     criaVotacao,
     votacaoEstado,
     votacaoMaisDado,
-    postVidaJogador
+    postVidaJogador,
+    getOpcoesSalvas
 }
