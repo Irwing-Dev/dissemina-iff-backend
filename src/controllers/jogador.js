@@ -6,7 +6,7 @@ import { personagens } from '../models/Jogadores.js';
 // }
 
 // Retorna estado atual do jogador
-const jogador = (req, res) => {
+const player = (req, res) => {
   const jogador = personagens[String(req.params.jogador)]
   if (!jogador) return res.status(404).json({ erro: 'Jogador não encontrado' })
 
@@ -14,13 +14,14 @@ const jogador = (req, res) => {
     votacaoAberta: jogador.votacaoAberta,
     rolagemAberta: jogador.rolagemAberta,
     resultadoVotacao: jogador.mensagemVotacao,
-    jogador: req.params.jogador
+    jogador: req.params.jogador,
+    vidaAtual:jogador.vidaAtual
   })
 }
 
 
 // delayzinho
-const delay =(delay) => new Promise(resolve => setTimeout(resolve, delay))
+const delay = (delay) => new Promise(resolve => setTimeout(resolve, delay))
 
 // Rola todos os dados
 const rollAll = async(req, res) => {
@@ -45,7 +46,7 @@ const rollAll = async(req, res) => {
       resultados.push({
         name: dado.name, 
         todas_rolagem: dado.rolagem, 
-        rolagem_atual:dado.roll()
+        rolagem_atual: dado.roll()
       });
     });
   }
@@ -68,11 +69,12 @@ const rollAll = async(req, res) => {
 
 // Retorna opções de votação
 
+// Vota nas opções com rolagem de dado
 const depositaVotoComDado = (req, res) => {
   const voto = req.params.voto;
   const jogador = personagens[String(req.params.jogador)]
   if (!jogador) return res.status(404).json({ erro: 'Jogador não encontrado' })
-  if(!voto) return res.status(400).json({message: "Não enviou o voto paisão"})
+  if (!voto) return res.status(400).json({message: "Não enviou o voto paisão"})  
 
     const roladas = [];
     let votos;
@@ -83,17 +85,17 @@ const depositaVotoComDado = (req, res) => {
           roladas.push({name:opcao.dado[j].name, rolagem: opcao.dado[j].roll()});
         }
 
-        jogador.votacao[i]++
-        votos = jogador.votacao[i];
-        jogador.votosTotal++
-        break;
-      }
-  }
+          jogador.votacao[i]++
+          votos = jogador.votacao[i];
+          jogador.votosTotal++
+          break;
+        }
+    }
   
   return res.status(200).json({valoresDasRolagem: roladas, votos: votos});
 }
 
-
+// Mostra a votação atual
 const votacao = (req, res) => {
   const jogador = personagens[String(req.params.jogador)]
   if (!jogador) return res.status(404).json({ erro: 'Jogador não encontrado' })
@@ -113,15 +115,22 @@ const votacao = (req, res) => {
   });
 }
 
-// Registrar voto
+// Vota nas opções sem dado
 const depositaVoto = (req, res) => {
   const jogador = personagens[String(req.params.jogador)]
   if (!jogador) return res.status(404).json({ erro: 'Jogador não encontrado' })
 
-  const voto = req.params.voto
+  const voto = req.params.voto;
+  const uid = req.body.uid;
+
+  if (!Array.isArray(jogador.votantes)) jogador.votantes = [];
+  if (jogador.votantes.includes(uid)) {
+    return res.status(403).json({ erro: "Você já votou nessa rodada!"});
+  }
+  jogador.votantes.push(uid);
   
   for (let i in jogador.opcoes) {
-    if (voto == jogador.opcoes[i].name) {
+    if (voto == jogador.opcoes[i]) {  
         jogador.votacao[i]++
       }
     }
@@ -134,11 +143,18 @@ const depositaVoto = (req, res) => {
   })
 }
 
+// Mostrar vida do jogador
+const getVidaJogador = (req,res) => {
+  const jogador = personagens[String(req.params.jogador)];
+  return res.json({vidaAtual:jogador.vidaAtual})
+}
+
 export default {
   // logIn,
-  jogador,
+  player,
   rollAll,
-  votacao, 
+  votacao,
   depositaVoto,
-  depositaVotoComDado
-}
+  depositaVotoComDado,
+  getVidaJogador
+};

@@ -8,11 +8,23 @@ const iniciaRolagens = (req, res) => {
     const jogador = personagens[key];
     if (!jogador) return res.status(404).json({ error: 'Jogador não encontrado' });
 
-    jogador.dado_acao.resetaRolagens();
-    jogador.numRolagens = 0;
-    if(req.body.dados) {
-        jogador.dados = req.body.dados.map((dado, index) => new Dado(dado.lados, dado.quantidade, dado.name, dado.bonus | 0));
+    if(req.body.dados && Array.isArray(req.body.dados)) {
+        jogador.dados = req.body.dados.map((dado, index) => {
+            const lados = dado.lados;
+            const quantidade = dado.quantidade;
+            const bonus = dado.bonus || 0;
+            const name = dado.name;
+
+            if (typeof lados !== 'number' || typeof quantidade !== 'number' || lados <= 0 || quantidade <= 0) {
+                 throw new Error(`Configuração de dado inválida: lados=${lados}, quantidade=${quantidade}`);
+            }
+
+            return new Dado(lados, quantidade, name, bonus);
+        });
+    } else {
+        jogador.dados = [];
     }
+    
     jogador.dado_acao.bonus = req.body.bonus_acao;
     jogador.rolagemAberta = true;
 
@@ -91,15 +103,20 @@ const criaVotacao = (req, res) => {
         jogador.votacao[i] = 0
     }
 
-    jogador.votosTotal = 0
+    jogador.votosTotal = 0;
+    jogador.votantes = [];
     res.json({jogador: req.params.jogador})
 }
 
 const votacaoEstado = (req, res) => {
     const jogador = personagens[String(req.params.jogador)]
+    
     let opcoesComDado = jogador.opcoesComDado;
-    let opcoes =  opcoesComDado ? opcoesComDado: jogador.opcoes 
+    // Verifica se opcoesComDado existe E tem elementos
+    let opcoes = (opcoesComDado && opcoesComDado.length > 0) ? opcoesComDado : jogador.opcoes
 
+    console.log('DEBUG - opcoes escolhidas:', opcoes)
+    
     const result = opcoes.map((op, index) => ({
         name: op.name,
         votos: jogador.votacao[index],
@@ -108,15 +125,27 @@ const votacaoEstado = (req, res) => {
 
     
     jogador.opcoesComDado = undefined
-    jogador.opcoes = undefined
+    jogador.opcoes = undefined      
     jogador.votacaoAberta = false
-    res.json({ votosTotal: jogador.votosTotal, result })
 }
+
+// Registrar vida do jogador
+const postVidaJogador = (req,res) => {
+  console.log('Passei aqui')
+  const jogador = personagens[String(req.params.jogador)];
+  const vidaNova = req.body.vidaNova
+  jogador.vidaAtual = vidaNova;
+  return res.json({
+    vidaAtual:vidaNova
+  })
+}
+
 
 export default {
     iniciaRolagens,
     exibeRolagem,
     criaVotacao,
     votacaoEstado,
-    votacaoMaisDado
+    votacaoMaisDado,
+    postVidaJogador
 }

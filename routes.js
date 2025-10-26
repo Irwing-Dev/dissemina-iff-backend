@@ -9,23 +9,28 @@ const route = express.Router()
 // route.get('/', jogador.logIn)
 
 //rotas do mestre para dados
-route.get('/mestre/:jogador/exibeRolagem', mestre.exibeRolagem);
 route.post('/mestre/:jogador/iniciaRolagens', mestre.iniciaRolagens);
+route.get('/mestre/:jogador/exibeRolagem', mestre.exibeRolagem);
 
 //rotas do mestre para escolhas
 route.post('/mestre/:jogador/criaVotacao', mestre.criaVotacao);
 route.post('/mestre/:jogador/criaVotacaoComDado', mestre.votacaoMaisDado);
 route.get('/mestre/:jogador/exibeVotacao', mestre.votacaoEstado);
 
+//rota do mestre para atualizar/registrar a vida 
+route.post("/mestre/:jogador/vida", mestre.postVidaJogador);
+
+//rota do jogador para vida
+route.get("/jogador/:jogador/vida", jogador.getVidaJogador);
+
 //rotas do jogador para rolar dados
-route.post('/jogador/:jogador', jogador.jogador);
-route.get('/jogador/:jogador', jogador.jogador);
-route.get('/jogador/:jogador/rolaTodos', jogador.rollAll);
+route.post('/jogador/:jogador', jogador.player);
+route.post('/jogador/:jogador/rolaTodos', jogador.rollAll);
+route.get('/jogador/:jogador', jogador.player);
 
 //rotas do jogador para escolhas
 route.get('/jogador/:jogador/votacao', jogador.votacao);
 route.post('/jogador/:jogador/votacao/:voto', jogador.depositaVoto);
 route.post('/jogador/:jogador/votacaoComDado/:voto', jogador.depositaVotoComDado);
-
 
 export default route
