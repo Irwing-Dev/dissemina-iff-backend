@@ -120,13 +120,14 @@ const votacaoEstado = (req, res) => {
     const result = opcoes.map((op, index) => ({
         name: op.name,
         votos: jogador.votacao[index],
-        rolagens: op.dado.map((d, index) => {return {name: d.name, moda: d.moda()}})
+        rolagens: (op.dado && op.dado.length> 0) ? op.dado.map((d, index) => {return {name: d.name, moda: d.moda()}}) : null
     }))
 
     
     jogador.opcoesComDado = undefined
     jogador.opcoes = undefined      
     jogador.votacaoAberta = false
+    res.json({ votosTotal: jogador.votosTotal, result })
 }
 
 // Registrar vida do jogador

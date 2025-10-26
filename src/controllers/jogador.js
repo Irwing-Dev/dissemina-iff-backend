@@ -81,13 +81,16 @@ const depositaVotoComDado = (req, res) => {
   for(let i = 0; i < jogador.opcoesComDado.length; i++) {
     const opcao = jogador.opcoesComDado[i]
       if(opcao.name == voto) {
-        for(let j in opcao.dado) {
-          roladas.push({name:opcao.dado[j].name, rolagem: opcao.dado[j].roll()});
-        }
+        
 
           jogador.votacao[i]++
           votos = jogador.votacao[i];
           jogador.votosTotal++
+          
+          if(!opcao.dado || opcao.dado.length < 1) break;
+          for(let j in opcao.dado) {
+            roladas.push({name:opcao.dado[j].name, rolagem: opcao.dado[j].roll()});
+          }
           break;
         }
     }
