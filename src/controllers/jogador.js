@@ -5,10 +5,6 @@ import { personagens } from '../models/Jogadores.js';
 //   res.json({ mensagem: 'Login endpoint ativo. Envie dados via POST se necessário.' })
 // }
 
-
-
-
-
 // Retorna estado atual do jogador
 const jogador = (req, res) => {
   const jogador = personagens[String(req.params.jogador)]
@@ -78,11 +74,14 @@ const depositaVotoComDado = (req, res) => {
   if (!jogador) return res.status(404).json({ erro: 'Jogador não encontrado' })
   if(!voto) return res.status(400).json({message: "Não enviou o voto paisão"})
 
-    let rolada;
+    const roladas = [];
     let votos;
   for(let i = 0; i < jogador.opcoesComDado.length; i++) {
-      if(jogador.opcoesComDado[i].name == voto) {
-        rolada = jogador.opcoesComDado[i].dado.roll();
+    const opcao = jogador.opcoesComDado[i]
+      if(opcao.name == voto) {
+        for(let j in opcao.dado) {
+          roladas.push({name:opcao.dado[j].name, rolagem: opcao.dado[j].roll()});
+        }
 
         jogador.votacao[i]++
         votos = jogador.votacao[i];
@@ -91,7 +90,7 @@ const depositaVotoComDado = (req, res) => {
       }
   }
   
-  return res.status(200).json({valorRolagem: rolada, votos: votos});
+  return res.status(200).json({valoresDasRolagem: roladas, votos: votos});
 }
 
 
@@ -104,7 +103,6 @@ const votacao = (req, res) => {
       jogador: req.params.jogador,
       opcoes: jogador.opcoes,
       opcoesComDado: jogador.opcoesComDado,
-      opcoesPadrao: jogador.opcoesPadrao,
       votacaoAberta: true
     })
   }

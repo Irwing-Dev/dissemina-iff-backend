@@ -19,25 +19,6 @@ const iniciaRolagens = (req, res) => {
     return res.json({ jogador: key });
 }
 
-const votacaoMaisDado = (req, res) => {
-    const key = String(req.params.jogador);
-    const jogador = personagens[key];
-    if (!jogador) return res.status(404).json({ error: 'Jogador não encontrado' });
-
-    jogador.opcoesComDado = req.body.opcoes.map((op, index) => new OpcaoComDado(
-        op.name, 
-        new Dado(op.dado.lados, op.dado.quantidade, op.dado.name, op.dado.bonus | 0),
-    ));
-
-
-    for(let i = 0; i < jogador.opcoesComDado.length; i++) {
-        jogador.votacao[i] = 0
-    }
-    jogador.votosTotal = 0
-    jogador.votacaoAberta = true;
-    return res.status(200).json({jogador: key});
-}
-
 const exibeRolagem = (req, res) => {
     const jogador = personagens[String(req.params.jogador)];
     jogador.rolagemAberta = false;
@@ -48,24 +29,25 @@ const exibeRolagem = (req, res) => {
         mult = 2
     }
     const bonus = jogador.dado_acao.bonus | 0
+    const totalNumerico = acao + bonus;
     const modas = [
         {
             name: jogador.dado_acao.name,
             valor: acao,
             bonus: bonus,
-            mult: mult,
+            total: `${acao} + ${bonus} = ${totalNumerico}`
         }
     ]
 
     if(jogador.dados) {
         jogador.dados.forEach(dado => {
-            const valor = dado.moda();
-
+            let valor = dado.moda();
+            if(Array.isArray(valor))
             modas.push({
                 name: dado.name, 
                 valor: valor, 
                 bonus: dado.bonus | 0,
-                mult: mult,
+                total: `${valor} + ${dado.bonus} = ${(valor)+dado.bonus}`
             })
         });
     }
@@ -79,6 +61,25 @@ const exibeRolagem = (req, res) => {
 }
 
 //rotas do mestre para escolhas
+
+const votacaoMaisDado = (req, res) => {
+    const key = String(req.params.jogador);
+    const jogador = personagens[key];
+    if (!jogador) return res.status(404).json({ error: 'Jogador não encontrado' });
+
+    jogador.opcoesComDado = req.body.opcoes.map(op => new OpcaoComDado(
+        op.name,
+        op.dados.map(dado => new Dado(dado.lados, dado.quantidade, dado.name, dado.bonus | 0)),
+    ));
+
+
+    for(let i = 0; i < jogador.opcoesComDado.length; i++) {
+        jogador.votacao[i] = 0
+    }
+    jogador.votosTotal = 0
+    jogador.votacaoAberta = true;
+    return res.status(200).json({jogador: key});
+}
 
 const criaVotacao = (req, res) => {
     const jogador = personagens[String(req.params.jogador)];
@@ -102,8 +103,10 @@ const votacaoEstado = (req, res) => {
     const result = opcoes.map((op, index) => ({
         name: op.name,
         votos: jogador.votacao[index],
-        moda: opcoesComDado ? opcoesComDado[index].dado.moda() : undefined
+        rolagens: op.dado.map((d, index) => {return {name: d.name, moda: d.moda()}})
     }))
+
+    
     jogador.opcoesComDado = undefined
     jogador.opcoes = undefined
     jogador.votacaoAberta = false
