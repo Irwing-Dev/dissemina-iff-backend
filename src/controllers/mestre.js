@@ -35,31 +35,42 @@ const exibeRolagem = (req, res) => {
     const jogador = personagens[String(req.params.jogador)];
     jogador.rolagemAberta = false;
 
-    const acao = jogador.dado_acao.moda();
-    let mult = 1
-    if(acao == jogador.dado_acao.lados) {
-        mult = 2
-    }
-    const bonus = jogador.dado_acao.bonus | 0
-    const totalNumerico = acao + bonus;
+    // Por hora, sem dado de Ação parcero
+
+    // const acao = jogador.dado_acao.moda();
+    // let mult = 1
+    // if(acao == jogador.dado_acao.lados) {
+    //     mult = 2
+    // }
+    // const bonus = jogador.dado_acao.bonus | 0
+    // const totalNumerico = acao + bonus;
     const modas = [
-        {
-            name: jogador.dado_acao.name,
-            valor: acao,
-            bonus: bonus,
-            total: `${acao} + ${bonus} = ${totalNumerico}`
-        }
+        // {
+        //     name: jogador.dado_acao.name,
+        //     valor: acao,
+        //     bonus: bonus,
+        //     total: `${acao} + ${bonus} = ${totalNumerico}`
+        // }
     ]
 
     if(jogador.dados) {
         jogador.dados.forEach(dado => {
             let valor = dado.moda();
-            if(Array.isArray(valor))
+            let valorAcumulado;
+            let bonus_dado = dado.bonus | 0;
+            if (Array.isArray(valor)) {
+                valorAcumulado = valor.reduce((soma, num) => soma + num, 0); // reduce 1 : for loop 0
+            } else {
+                valorAcumulado = valor;
+            }
+
+            let total = valorAcumulado + bonus_dado;
+
             modas.push({
                 name: dado.name, 
                 valor: valor, 
                 bonus: dado.bonus | 0,
-                total: `${valor} + ${dado.bonus} = ${(valor)+dado.bonus}`
+                total: `${valorAcumulado} + ${bonus_dado} = ${total}`
             })
         });
     }
@@ -81,13 +92,16 @@ const votacaoMaisDado = (req, res) => {
 
     jogador.opcoesComDado = req.body.opcoes.map(op => new OpcaoComDado(
         op.name,
-        op.dados.map(dado => new Dado(dado.lados, dado.quantidade, dado.name, dado.bonus | 0)),
+        // op.dados.map não é uma função, op.dados é do tipo undefined op.dados.map(dado => new Dado(dado.lados, dado.quantidade, dado.name, dado.bonus | 0)),
+        new Dado(op.dados.lados, op.dados.quantidade, op.dados.name, op.dados.bonus | 0),
     ));
-
 
     for(let i = 0; i < jogador.opcoesComDado.length; i++) {
         jogador.votacao[i] = 0
     }
+
+    jogador.opcoes = undefined; 
+    jogador.votacao = Array(jogador.opcoesComDado.length).fill(0);
     jogador.votosTotal = 0
     jogador.votacaoAberta = true;
     return res.status(200).json({jogador: key});
@@ -123,19 +137,52 @@ const votacaoEstado = (req, res) => {
 
     console.log('DEBUG - opcoes escolhidas:', opcoes)
     
-    const result = opcoes.map((op, index) => ({
-        name: op.name,
-        votos: jogador.votacao[index],
-        // Clean code é pros fracos coda-fofo
-        rolagens: (op.dado && op.dado.length> 0) ? op.dado.map((d, index) => {return {name: d.name, moda: d.moda()}}) : null
-    }))
+    const result = opcoes.map((op, index) => {
+        const isDiceVote = opcoesComDado && op.dado; 
+        
+        let rolagensResultado = null;
+        if (isDiceVote) {
+            rolagensResultado = { 
+                name: op.dado.name, 
+                moda: op.dado.moda() 
+            };
+            return {
+                name: op.name,
+                votos: jogador.votacao[index],
+                rolagens: rolagensResultado
+            };
+        } else {
+            return {
+                name: op,
+                votos: jogador.votacao[index]
+            }
+        }
+        
+    //     {
 
+    //     name: op.name,
+    //     votos: jogador.votacao[index],
+    //     // Clean code é pros fracos coda-fofo
+    //     rolagens: (op.dado && op.dado.length> 0) ? op.dado.map((d, index) => {return {name: d.name, moda: d.moda()}}) : null
+    // }
+    })
+
+    if (opcoesComDado && opcoesComDado.length > 0) {
+        opcoes.forEach(op => {
+            if (op.dado) {
+                // Isso é mais limpo do que tentar deletar propriedades diretamente.
+                // Se a intenção era remover a propriedade de rolagem do objeto, usar o 'resetaRolagens' é mais seguro.
+                op.dado.resetaRolagens(); 
+            }
+        });
+    }
     
     jogador.opcoesComDado = undefined
     jogador.opcoes = undefined      
     jogador.votacaoAberta = false
-    opcoes.forEach(op => delete op.dado.forEach(d => delete d.rolagem))
-    jogador.opcoesPadrao.push(...opcoes)
+    // que troço é esse?
+    //opcoes.forEach(op => delete op.dado.forEach(d => delete d.rolagem))
+    //jogador.opcoesPadrao.push(...opcoes)
     res.json({ votosTotal: jogador.votosTotal, result })
 }
 
