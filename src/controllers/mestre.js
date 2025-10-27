@@ -28,7 +28,7 @@ const iniciaRolagens = (req, res) => {
     jogador.dado_acao.bonus = req.body.bonus_acao;
     jogador.rolagemAberta = true;
 
-    return res.json({ jogador: key });
+    return res.json({ jogador: key, bonus_acao: jogador.dado_acao.bonus, acoes: jogador.dado_acao });
 }
 
 const exibeRolagem = (req, res) => {
@@ -58,19 +58,22 @@ const exibeRolagem = (req, res) => {
             let valor = dado.moda();
             let valorAcumulado;
             let bonus_dado = dado.bonus | 0;
+            
+            const bonus_geral = jogador.dado_acao.bonus
             if (Array.isArray(valor)) {
                 valorAcumulado = valor.reduce((soma, num) => soma + num, 0); // reduce 1 : for loop 0
             } else {
                 valorAcumulado = valor;
             }
 
-            let total = valorAcumulado + bonus_dado;
+            let total = valorAcumulado + bonus_dado + bonus_geral;
 
             modas.push({
                 name: dado.name, 
                 valor: valor, 
                 bonus: dado.bonus | 0,
-                total: `${valorAcumulado} + ${bonus_dado} = ${total}`
+                bonus_acao: bonus_geral | 0,
+                total: `${valorAcumulado} + ${bonus_dado} + ${bonus_geral} = ${total}`
             })
         });
     }
@@ -103,6 +106,7 @@ const votacaoMaisDado = (req, res) => {
     jogador.opcoes = undefined; 
     jogador.votacao = Array(jogador.opcoesComDado.length).fill(0);
     jogador.votosTotal = 0
+    jogador.votantes = [];
     jogador.votacaoAberta = true;
     return res.status(200).json({jogador: key});
 }

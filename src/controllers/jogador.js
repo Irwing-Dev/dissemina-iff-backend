@@ -72,23 +72,29 @@ const rollAll = async(req, res) => {
 // Vota nas opções com rolagem de dado
 const depositaVotoComDado = (req, res) => {
   const voto = req.params.voto;
-  const jogador = personagens[String(req.params.jogador)]
-  if (!jogador) return res.status(404).json({ erro: 'Jogador não encontrado' })
-  if (!voto) return res.status(400).json({message: "Não enviou o voto paisão"})  
+  const jogador = personagens[String(req.params.jogador)];
+  const uid = req.body.uid;
+  if (!jogador) return res.status(404).json({ erro: 'Jogador não encontrado' });
+  if (!voto) return res.status(400).json({message: "Não enviou o voto paisão"});
+  
+  if (!Array.isArray(jogador.votantes)) jogador.votantes = [];
+  if (jogador.votantes.includes(uid)) return res.status(403).json({ erro: "Você já votou nessa rodada!"});
+
+  jogador.votantes.push(uid);
 
     const roladas = [];
     let votos;
-  for(let i = 0; i < jogador.opcoesComDado.length; i++) {
-    const opcao = jogador.opcoesComDado[i]
-      if(opcao.name == voto) {
-          const resultadoRolagem = opcao.dado.roll();
-          roladas.push({name: opcao.dado.name, rolagem: resultadoRolagem});
+    for(let i = 0; i < jogador.opcoesComDado.length; i++) {
+      const opcao = jogador.opcoesComDado[i]
+        if(opcao.name == voto) {
+            const resultadoRolagem = opcao.dado.roll();
+            roladas.push({name: opcao.dado.name, rolagem: resultadoRolagem});
 
-          jogador.votacao[i]++
-          votos = jogador.votacao[i];
-          jogador.votosTotal++
-        }
-    }
+            jogador.votacao[i]++
+            votos = jogador.votacao[i];
+            jogador.votosTotal++
+          }
+      }
   
   return res.status(200).json({valoresDasRolagem: roladas, votos: votos});
 }
@@ -122,9 +128,8 @@ const depositaVoto = (req, res) => {
   const uid = req.body.uid;
 
   if (!Array.isArray(jogador.votantes)) jogador.votantes = [];
-  if (jogador.votantes.includes(uid)) {
-    return res.status(403).json({ erro: "Você já votou nessa rodada!"});
-  }
+  if (jogador.votantes.includes(uid)) return res.status(403).json({ erro: "Você já votou nessa rodada!"});
+  
   jogador.votantes.push(uid);
   
   for (let i in jogador.opcoes) {
