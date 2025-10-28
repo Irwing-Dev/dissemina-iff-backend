@@ -1,6 +1,7 @@
 import { personagens } from '../models/Jogadores.js';
 import { Dado } from "../models/Dado.js"
 import { OpcaoComDado } from '../models/OpcaoComDado.js';
+import { conexoes } from './jogador.js';
 
 //rotas do mestre para dados
 const iniciaRolagens = (req, res) => {
@@ -190,17 +191,34 @@ const votacaoEstado = (req, res) => {
     res.json({ votosTotal: jogador.votosTotal, result })
 }
 
-// Registrar vida do jogador
-const postVidaJogador = (req,res) => {
-  console.log('Passei aqui')
-  const jogador = personagens[String(req.params.jogador)];
-  const vidaNova = req.body.vidaNova
-  jogador.vidaAtual = vidaNova;
-  return res.json({
-    vidaAtual:vidaNova
-  })
-}
 
+const postVidaJogador = (req, res) => {
+  const jogadorId = String(req.params.jogador);
+  const vidaNova = req.body.vidaNova;
+
+  console.log('Recebendo vida:', vidaNova, 'para', jogadorId);
+
+  // Atualiza no personagens
+  if (personagens[jogadorId]) {
+    personagens[jogadorId].vidaAtual = vidaNova;
+  } else {
+    return res.status(404).json({ error: 'Jogador não encontrado' });
+  }
+
+  // Envia para todos os clientes SSE conectados
+  if (conexoes[jogadorId]) {
+    console.log(`Enviando sse para ${conexoes[jogadorId].length} clientes`);
+    conexoes[jogadorId].forEach(res => {
+      try {
+        res.write(`data: ${JSON.stringify({ vidaAtual: vidaNova })}\n\n`);
+      } catch (err) {
+        console.error('Erro ao enviar sse:', err);
+      }
+    });
+  }
+
+  return res.json({ vidaAtual: vidaNova });
+};
 
 export default {
     iniciaRolagens,

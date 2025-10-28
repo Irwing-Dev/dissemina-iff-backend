@@ -22,7 +22,7 @@ route.get('/mestre/:jogador/opcoesSalvas', mestre.getOpcoesSalvas);
 route.post("/mestre/:jogador/vida", mestre.postVidaJogador);
 
 //rota do jogador para vida
-route.get("/jogador/:jogador/vida", jogador.getVidaJogador);
+route.get("/jogador/:jogador/vida", jogador.vidaStream);
 
 //rotas do jogador para rolar dados
 route.post('/jogador/:jogador', jogador.player);

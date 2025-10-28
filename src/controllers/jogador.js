@@ -146,11 +146,63 @@ const depositaVoto = (req, res) => {
   })
 }
 
+export const conexoes = {};
+
+
 // Mostrar vida do jogador
 const getVidaJogador = (req,res) => {
   const jogador = personagens[String(req.params.jogador)];
   return res.json({vidaAtual:jogador.vidaAtual})
 }
+
+const vidaStream = (req, res) => {
+  const jogadorId = String(req.params.jogador); 
+  
+  console.log(`nova conexão SSE para jogador: ${jogadorId}`);
+
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.flushHeaders?.();
+
+  // Inicializa array de conexões se não existir
+  if (!conexoes[jogadorId]) {
+    conexoes[jogadorId] = [];
+  }
+
+  conexoes[jogadorId].push(res);
+
+  // Envia vida atual imediatamente
+  const vidaAtual = personagens[jogadorId]?.vidaAtual || 0;
+  console.log(`Enviando vida inicial: ${vidaAtual} para ${jogadorId}`);
+  res.write(`data: ${JSON.stringify({ vidaAtual })}\n\n`);
+
+  // Remove conexão quando fechar
+  req.on('close', () => {
+    console.log(`Conexão SSE fechada para: ${jogadorId}`);
+    if (conexoes[jogadorId]) {
+      conexoes[jogadorId] = conexoes[jogadorId].filter(connection => connection !== res);
+      
+      // Limpa array vazio
+      if (conexoes[jogadorId].length === 0) {
+        delete conexoes[jogadorId];
+      }
+    }
+  });
+
+  const keepAlive = setInterval(() => {
+    try {
+      res.write(': keep-alive\n\n');
+    } catch (err) {
+      clearInterval(keepAlive);
+    }
+  }, 30000);
+
+  req.on('close', () => {
+    clearInterval(keepAlive);
+  });
+};
+
 
 export default {
   // logIn,
@@ -159,5 +211,7 @@ export default {
   votacao,
   depositaVoto,
   depositaVotoComDado,
-  getVidaJogador
+  getVidaJogador,
+  vidaStream,
+  conexoes
 };
