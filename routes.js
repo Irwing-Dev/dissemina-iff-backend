@@ -1,12 +1,8 @@
 import express from 'express'   //pegando o express q eu baixei
 import jogador from './src/controllers/jogador.js' //importando o arquivo global.js
 import mestre from './src/controllers/mestre.js' //importando o arquivo mestre.js
-// import { dados } from './src/controllers/dados.js' //importando o arquivo dados.js
 
 const route = express.Router()
-
-// Rotas da raiz do site
-// route.get('/', jogador.logIn)
 
 //rotas do mestre para dados
 route.post('/mestre/:jogador/iniciaRolagens', mestre.iniciaRolagens);

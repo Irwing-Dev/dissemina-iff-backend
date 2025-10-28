@@ -1,10 +1,6 @@
 import { Dado } from '../models/Dado.js';
 import { personagens } from '../models/Jogadores.js';
 
-// const logIn = (req, res) => {
-//   res.json({ mensagem: 'Login endpoint ativo. Envie dados via POST se necessário.' })
-// }
-
 // Retorna estado atual do jogador
 const player = (req, res) => {
   const jogador = personagens[String(req.params.jogador)]
@@ -87,12 +83,18 @@ const depositaVotoComDado = (req, res) => {
     for(let i = 0; i < jogador.opcoesComDado.length; i++) {
       const opcao = jogador.opcoesComDado[i]
         if(opcao.name == voto) {
-            const resultadoRolagem = opcao.dado.roll();
-            roladas.push({name: opcao.dado.name, rolagem: resultadoRolagem});
 
             jogador.votacao[i]++
             votos = jogador.votacao[i];
-            jogador.votosTotal++
+            jogador.votosTotal++;
+            if(!opcao.dado || opcao.dado.length < 1) break;
+            for(let j in opcao.dado) {
+              roladas.push({
+                name: opcao.dado[j].name, 
+                rolagem: opcao.dado[j].roll()
+              });
+          }
+          break;
           }
       }
   

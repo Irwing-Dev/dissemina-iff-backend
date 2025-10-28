@@ -36,36 +36,16 @@ const exibeRolagem = (req, res) => {
     const jogador = personagens[String(req.params.jogador)];
     jogador.rolagemAberta = false;
 
-    // Por hora, sem dado de Ação parcero
-
-    // const acao = jogador.dado_acao.moda();
-    // let mult = 1
-    // if(acao == jogador.dado_acao.lados) {
-    //     mult = 2
-    // }
-    // const bonus = jogador.dado_acao.bonus | 0
-    // const totalNumerico = acao + bonus;
-    const modas = [
-        // {
-        //     name: jogador.dado_acao.name,
-        //     valor: acao,
-        //     bonus: bonus,
-        //     total: `${acao} + ${bonus} = ${totalNumerico}`
-        // }
-    ]
+    const modas = []
 
     if(jogador.dados) {
         jogador.dados.forEach(dado => {
             let valor = dado.moda();
-            let valorAcumulado;
             let bonus_dado = dado.bonus | 0;
-            
             const bonus_geral = jogador.dado_acao.bonus
-            if (Array.isArray(valor)) {
-                valorAcumulado = valor.reduce((soma, num) => soma + num, 0); // reduce 1 : for loop 0
-            } else {
-                valorAcumulado = valor;
-            }
+
+            // Soma os valores em uma variável se houver mais de um dado rolado ou mantém o valor se só houver um
+            let valorAcumulado = Array.isArray(valor) ? valor.reduce((soma, num) => soma + num, 0) : valor;
 
             let total = valorAcumulado + bonus_dado + bonus_geral;
 
@@ -96,8 +76,7 @@ const votacaoMaisDado = (req, res) => {
 
     jogador.opcoesComDado = req.body.opcoes.map(op => new OpcaoComDado(
         op.name,
-        // op.dados.map não é uma função, op.dados é do tipo undefined op.dados.map(dado => new Dado(dado.lados, dado.quantidade, dado.name, dado.bonus | 0)),
-        new Dado(op.dados.lados, op.dados.quantidade, op.dados.name, op.dados.bonus | 0),
+        op.dados.map(dado => new Dado(dado.lados, dado.quantidade, dado.name, dado.bonus | 0))
     ));
 
     for(let i = 0; i < jogador.opcoesComDado.length; i++) {
@@ -139,7 +118,7 @@ const votacaoEstado = (req, res) => {
     let opcoesComDado = jogador.opcoesComDado;
     // Verifica se opcoesComDado existe E tem elementos
     let opcoes = (opcoesComDado && opcoesComDado.length > 0) ? opcoesComDado : jogador.opcoes
-
+    
     console.log('DEBUG - opcoes escolhidas:', opcoes)
     
     const result = opcoes.map((op, index) => {
@@ -147,10 +126,14 @@ const votacaoEstado = (req, res) => {
         
         let rolagensResultado = null;
         if (isDiceVote) {
-            rolagensResultado = { 
-                name: op.dado.name, 
-                moda: op.dado.moda() 
-            };
+            rolagensResultado = op.dado.map(d => ({
+                name: d.name,
+                moda: d.moda(),
+                bonus: d.bonus,
+                moda_geral: ((Array.isArray(d.moda())) ? d.moda().reduce((acc, num) => acc + num, 0) : d.moda()),
+                total: (((Array.isArray(d.moda())) ? d.moda().reduce((acc, num) => acc + num, 0) : d.moda()) + d.bonus)
+            })) 
+
             return {
                 name: op.name,
                 votos: jogador.votacao[index],
@@ -162,33 +145,23 @@ const votacaoEstado = (req, res) => {
                 votos: jogador.votacao[index]
             }
         }
-        
-    //     {
-
-    //     name: op.name,
-    //     votos: jogador.votacao[index],
-    //     // Clean code é pros fracos coda-fofo
-    //     rolagens: (op.dado && op.dado.length> 0) ? op.dado.map((d, index) => {return {name: d.name, moda: d.moda()}}) : null
-    // }
     })
 
     if (opcoesComDado && opcoesComDado.length > 0) {
         opcoes.forEach(op => {
-            if (op.dado) {
-                // Isso é mais limpo do que tentar deletar propriedades diretamente.
-                // Se a intenção era remover a propriedade de rolagem do objeto, usar o 'resetaRolagens' é mais seguro.
-                op.dado.resetaRolagens(); 
+            if (op.dado && Array.isArray(op.dado)) {
+                op.dado.forEach(dado => {
+                    dado.resetaRolagens();
+                });
             }
         });
     }
     
-    jogador.opcoesComDado = undefined
-    jogador.opcoes = undefined      
-    jogador.votacaoAberta = false
-    // que troço é esse?
-    //opcoes.forEach(op => delete op.dado.forEach(d => delete d.rolagem))
-    //jogador.opcoesPadrao.push(...opcoes)
-    res.json({ votosTotal: jogador.votosTotal, result })
+    jogador.opcoesComDado = undefined;
+    jogador.opcoes = undefined;
+    jogador.votacaoAberta = false;
+    (opcoesComDado && opcoesComDado.length > 0) ? jogador.opcoesPadrao.push(...opcoes.map(op => op.name)) : jogador.opcoesPadrao.push(...opcoes);
+    res.json({ votosTotal: jogador.votosTotal, result });
 }
 
 
