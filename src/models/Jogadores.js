@@ -26,11 +26,8 @@ function novoJogador(opcoesPadrao = []) {
   return new Jogador(opcoesPadrao);
 }
 
-// Apenas para efeito de teste, pode apagar
-const acoesGerais = ["Atacar meelee", "Atacar ranged", "Usar Item", "Fugir"]
-
 export const personagens = {
-  jogador1: novoJogador(acoesGerais),
-  jogador2: novoJogador(acoesGerais),
-  jogador3: novoJogador(acoesGerais)
+  jogador1: novoJogador(["Atacar com Espada", "Atacar de Longe", "Invocar Ilusão", "Ajudar", "Usar Item", "Fugir",]),
+  jogador2: novoJogador(["Atacar Corpo-a-Corpo", "Atacar de Longe", "Fingir", "Usar Item", "Fugir"]),
+  jogador3: novoJogador(["Atacar com Espada", "Atacar de Longe", "Defender", "Usar Item", "Fugir"])
 };
