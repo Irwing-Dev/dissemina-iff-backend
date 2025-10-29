@@ -160,7 +160,7 @@ const votacaoEstado = (req, res) => {
     jogador.opcoesComDado = undefined;
     jogador.opcoes = undefined;
     jogador.votacaoAberta = false;
-    (opcoesComDado && opcoesComDado.length > 0) ? jogador.opcoesPadrao.push(...opcoes.map(op => op.name)) : jogador.opcoesPadrao.push(...opcoes);
+    jogador.opcoesPadrao.push(...opcoes);
     res.json({ votosTotal: jogador.votosTotal, result });
 }
 
