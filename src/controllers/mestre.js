@@ -193,6 +193,55 @@ const postVidaJogador = (req, res) => {
   return res.json({ vidaAtual: vidaNova });
 };
 
+const votosStream = (req, res) => {
+  const jogadorId = String(req.params.jogador); 
+  
+  console.log(`nova conexão SSE para jogador: ${jogadorId}`);
+
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.flushHeaders?.();
+
+  // Inicializa array de conexões se não existir
+  if (!conexoes[jogadorId]) {
+    conexoes[jogadorId] = [];
+  }
+
+  conexoes[jogadorId].push(res);
+
+  // Envia votosTotal atual imediatamente
+  const votosTotal = personagens[jogadorId]?.votosTotal || 0;
+  console.log(`Enviando votosTotal: ${votosTotal} para ${jogadorId}`);
+  res.write(`data: ${JSON.stringify({ votosTotal })}\n\n`);
+
+  // Remove conexão quando fechar
+  req.on('close', () => {
+    console.log(`Conexão SSE fechada para: ${jogadorId}`);
+    if (conexoes[jogadorId]) {
+      conexoes[jogadorId] = conexoes[jogadorId].filter(connection => connection !== res);
+      
+      // Limpa array vazio
+      if (conexoes[jogadorId].length === 0) {
+        delete conexoes[jogadorId];
+      }
+    }
+  });
+
+  const keepAlive = setInterval(() => {
+    try {
+      res.write(': keep-alive\n\n');
+    } catch (err) {
+      clearInterval(keepAlive);
+    }
+  }, 30000);
+
+  req.on('close', () => {
+    clearInterval(keepAlive);
+  });
+};
+
+
 export default {
     iniciaRolagens,
     exibeRolagem,
@@ -200,5 +249,6 @@ export default {
     votacaoEstado,
     votacaoMaisDado,
     postVidaJogador,
-    getOpcoesSalvas
+    getOpcoesSalvas,
+    votosStream
 }

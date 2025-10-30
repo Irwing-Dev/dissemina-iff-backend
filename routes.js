@@ -13,6 +13,7 @@ route.post('/mestre/:jogador/criaVotacao', mestre.criaVotacao);
 route.post('/mestre/:jogador/criaVotacaoComDado', mestre.votacaoMaisDado);
 route.get('/mestre/:jogador/exibeVotacao', mestre.votacaoEstado);
 route.get('/mestre/:jogador/opcoesSalvas', mestre.getOpcoesSalvas);
+route.get('/mestre/:jogador/votos', mestre.votosStream)
 
 //rota do mestre para atualizar/registrar a vida 
 route.post("/mestre/:jogador/vida", mestre.postVidaJogador);
