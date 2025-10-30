@@ -27,7 +27,7 @@ function novoJogador(opcoesPadrao = []) {
 }
 
 export const personagens = {
-  jogador1: novoJogador(["Atacar com Espada", "Atacar de Longe", "Invocar Ilusão", "Ajudar", "Usar Item", "Fugir",]),
-  jogador2: novoJogador(["Atacar Corpo-a-Corpo", "Atacar de Longe", "Fingir", "Usar Item", "Fugir"]),
-  jogador3: novoJogador(["Atacar com Espada", "Atacar de Longe", "Defender", "Usar Item", "Fugir"])
+  jogador1: novoJogador(["Atacar com Katana", "Golpe Certeiro", "Invocar Ilusão", "Mãos Flamejantes", "Misseis Mágicos", "Recuperar Fôlego", "Ajudar", "Usar Item", "Fugir", ]),
+  jogador2: novoJogador(["Atacar com Espada Curta", "Ataque Furtivo", "Fingir", "Esconder", "Usar Item", "Fugir"]),
+  jogador3: novoJogador(["Atacar com Espada", "Raio de Fogo", "Defender", "Usar Item", "Fugir"])
 };
