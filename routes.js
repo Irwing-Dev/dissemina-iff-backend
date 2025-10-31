@@ -3,6 +3,10 @@ import jogador from './src/controllers/jogador.js' //importando o arquivo global
 import mestre from './src/controllers/mestre.js' //importando o arquivo mestre.js
 
 const route = express.Router()
+// pra manter essa bomba 24/7
+route.get("/ping", (res) => {
+    res.send("Pong");
+})
 
 //rotas do mestre para dados
 route.post('/mestre/:jogador/iniciaRolagens', mestre.iniciaRolagens);
