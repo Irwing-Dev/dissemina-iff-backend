@@ -11,7 +11,7 @@ class Jogador {
     this.rolagemAberta = false;
     this.votacaoAberta = false;
     
-   this.vidaAtual = 0
+   this.vidaAtual = 40
 
     this.mensagemVotacao = ""
     this.votacao = [];
