@@ -68,7 +68,8 @@ const rollAll = async(req, res) => {
 // Vota nas opções com rolagem de dado
 const depositaVotoComDado = (req, res) => {
   const voto = req.params.voto;
-  const jogador = personagens[String(req.params.jogador)];
+  const jogadorId = String(req.params.jogador)
+  const jogador = personagens[jogadorId];
   const uid = req.body.uid;
   if (!jogador) return res.status(404).json({ erro: 'Jogador não encontrado' });
   if (!voto) return res.status(400).json({message: "Não enviou o voto paisão"});
@@ -97,6 +98,16 @@ const depositaVotoComDado = (req, res) => {
           break;
           }
       }
+  if (conexoes[jogadorId]) {
+    console.log(`Enviando sse de votos para ${conexoes[jogadorId].length} clientes`);
+    conexoes[jogadorId].forEach(res => {
+      try {
+        res.write(`data: ${JSON.stringify({ votosTotal: jogador.votosTotal })}\n\n`);
+      } catch (err) {
+        console.error('Erro ao enviar sse:', err);
+      }
+    });
+  }
   
   return res.status(200).json({valoresDasRolagem: roladas, votos: votos});
 }

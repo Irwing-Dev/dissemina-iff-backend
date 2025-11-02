@@ -85,7 +85,6 @@ const votacaoMaisDado = (req, res) => {
 
     jogador.opcoes = undefined; 
     jogador.votacao = Array(jogador.opcoesComDado.length).fill(0);
-    jogador.votosTotal = 0
     jogador.votantes = [];
     jogador.votacaoAberta = true;
     return res.status(200).json({jogador: key});
@@ -114,7 +113,8 @@ const getOpcoesSalvas = (req, res) => {
 
 const votacaoEstado = (req, res) => {
     const jogador = personagens[String(req.params.jogador)]
-    
+    const votosTotal = jogador.votosTotal
+    jogador.votosTotal = 0
     let opcoesComDado = jogador.opcoesComDado;
     // Verifica se opcoesComDado existe E tem elementos
     let opcoes = (opcoesComDado && opcoesComDado.length > 0) ? opcoesComDado : jogador.opcoes
@@ -161,7 +161,7 @@ const votacaoEstado = (req, res) => {
     jogador.opcoes = undefined;
     jogador.votacaoAberta = false;
     jogador.opcoesPadrao.push(...opcoes);
-    res.json({ votosTotal: jogador.votosTotal, result });
+    res.json({ votosTotal: votosTotal, result });
 }
 
 

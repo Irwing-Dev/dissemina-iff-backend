@@ -4,7 +4,7 @@ import mestre from './src/controllers/mestre.js' //importando o arquivo mestre.j
 
 const route = express.Router()
 // pra manter essa bomba 24/7
-route.get("/ping", (res) => {
+route.get("/ping", (req, res) => {
     res.send("Pong");
 })
 
