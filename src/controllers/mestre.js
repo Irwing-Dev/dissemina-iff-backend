@@ -86,6 +86,7 @@ const votacaoMaisDado = (req, res) => {
     jogador.opcoes = undefined; 
     jogador.votacao = Array(jogador.opcoesComDado.length).fill(0);
     jogador.votantes = [];
+    jogador.votosTotal = 0;
     jogador.votacaoAberta = true;
     return res.status(200).json({jogador: key});
 }
