@@ -1,7 +1,8 @@
 import { Dado } from "./Dado.js";
 class Jogador {
   constructor(
-      opcoesPadrao = ["Ataque meelee", "Ataque ranged", "Usar item", "Fugir"]
+      opcoesPadrao = ["Ataque meelee", "Ataque ranged", "Usar item", "Fugir"],
+      vidaInicial = 40
     ) {
     this.dado_acao = new Dado(20, 1, "Dado de Ação"),
     this.numRolagens = 0
@@ -11,7 +12,7 @@ class Jogador {
     this.rolagemAberta = false;
     this.votacaoAberta = false;
     
-   this.vidaAtual = 40
+   this.vidaAtual = vidaInicial
 
     this.mensagemVotacao = ""
     this.votacao = [];
@@ -22,12 +23,12 @@ class Jogador {
   }
 }
 
-function novoJogador(opcoesPadrao = []) {
-  return new Jogador(opcoesPadrao);
+function novoJogador(opcoesPadrao = [], vidaInicial = 40) {
+  return new Jogador(opcoesPadrao, vidaInicial);
 }
 
 export const personagens = {
-  jogador1: novoJogador(["Atacar com Katana", "Golpe Certeiro", "Invocar Ilusão", "Mãos Flamejantes", "Misseis Mágicos", "Recuperar Fôlego", "Ajudar", "Usar Item", "Fugir", ]),
-  jogador2: novoJogador(["Atacar com Espada Curta", "Ataque Furtivo", "Fingir", "Esconder", "Usar Item", "Fugir"]),
-  jogador3: novoJogador(["Atacar com Espada", "Raio de Fogo", "Defender", "Usar Item", "Fugir"])
+  jogador1: novoJogador(["Atacar com Katana", "Golpe Certeiro", "Invocar Ilusão", "Mãos Flamejantes", "Misseis Mágicos", "Recuperar Fôlego", "Ajudar", "Usar Item", "Fugir", ], 40),
+  jogador2: novoJogador(["Atacar com Espada Curta", "Ataque Furtivo", "Fingir", "Esconder", "Usar Item", "Fugir"], 22),
+  jogador3: novoJogador(["Atacar com Espada", "Raio de Fogo", "Defender", "Usar Item", "Fugir"], 28)
 };
