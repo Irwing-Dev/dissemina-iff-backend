@@ -11,7 +11,7 @@ const player = (req, res) => {
     rolagemAberta: jogador.rolagemAberta,
     resultadoVotacao: jogador.mensagemVotacao,
     jogador: req.params.jogador,
-    vidaAtual:jogador.vidaAtual
+    numeroInimigos: jogador.numeroInimigos
   })
 }
 
@@ -162,10 +162,10 @@ const depositaVoto = (req, res) => {
 export const conexoes = {};
 
 
-// Mostrar vida do jogador
+// Mostrar número de inimigos do jogador
 const getVidaJogador = (req,res) => {
   const jogador = personagens[String(req.params.jogador)];
-  return res.json({vidaAtual:jogador.vidaAtual})
+  return res.json({ numeroInimigos: jogador.numeroInimigos })
 }
 
 const vidaStream = (req, res) => {
@@ -185,10 +185,10 @@ const vidaStream = (req, res) => {
 
   conexoes[jogadorId].push(res);
 
-  // Envia vida atual imediatamente
-  const vidaAtual = personagens[jogadorId]?.vidaAtual || 0;
-  console.log(`Enviando vida inicial: ${vidaAtual} para ${jogadorId}`);
-  res.write(`data: ${JSON.stringify({ vidaAtual })}\n\n`);
+  // Envia número de inimigos atual imediatamente
+  const numeroInimigos = personagens[jogadorId]?.numeroInimigos ?? 0;
+  console.log(`Enviando numeroInimigos inicial: ${numeroInimigos} para ${jogadorId}`);
+  res.write(`data: ${JSON.stringify({ numeroInimigos })}\n\n`);
 
   // Remove conexão quando fechar
   req.on('close', () => {

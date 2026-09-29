@@ -121,29 +121,60 @@ const votacaoEstado = (req, res) => {
     let opcoes = (opcoesComDado && opcoesComDado.length > 0) ? opcoesComDado : jogador.opcoes
     
     console.log('DEBUG - opcoes escolhidas:', opcoes)
+
+    const numeroInimigos = jogador.numeroInimigos ?? 0;
     
     const result = opcoes.map((op, index) => {
         const isDiceVote = opcoesComDado && op.dado; 
-        
-        let rolagensResultado = null;
+        const votosDaOpcao = jogador.votacao[index] ?? 0;
+
+        // Porcentagem: evita divisão por zero
+        const porcentagem = votosTotal > 0
+            ? Math.round((votosDaOpcao / votosTotal) * 100)
+            : 0;
+
+        // Quantidade de ataques: proporcional ao número de inimigos
+        // Usa Math.round — em casos exatos (40% de 10) resulta em 4;
+        // em decimais (33.3% de 10) resulta em 3 (arredondamento padrão)
+        const quantidadeAtaques = votosTotal > 0
+            ? Math.round((votosDaOpcao / votosTotal) * numeroInimigos)
+            : 0;
+
         if (isDiceVote) {
-            rolagensResultado = op.dado.map(d => ({
-                name: d.name,
-                moda: d.moda(),
-                bonus: d.bonus,
-                moda_geral: ((Array.isArray(d.moda())) ? d.moda().reduce((acc, num) => acc + num, 0) : d.moda()),
-                total: (((Array.isArray(d.moda())) ? d.moda().reduce((acc, num) => acc + num, 0) : d.moda()) + d.bonus)
-            })) 
+            // Gera quantidadeAtaques rolagens individuais
+            const ataques = [];
+            for (let a = 0; a < quantidadeAtaques; a++) {
+                const rolagens = op.dado.map(d => {
+                    // roll() retorna number (1 dado) ou number[] (múltiplos dados)
+                    const resultado = d.roll();
+                    // Soma se for array (ex: 3d4 = [2,3,4] → 9)
+                    const valorBruto = Array.isArray(resultado)
+                        ? resultado.reduce((acc, n) => acc + n, 0)
+                        : resultado;
+                    const total = valorBruto + (d.bonus ?? 0);
+                    return {
+                        name: d.name,
+                        resultado: resultado,
+                        bonus: d.bonus ?? 0,
+                        total: total
+                    };
+                });
+                ataques.push({ rolagens });
+            }
 
             return {
                 name: op.name,
-                votos: jogador.votacao[index],
-                rolagens: rolagensResultado
+                votos: votosDaOpcao,
+                porcentagem,
+                quantidadeAtaques,
+                ataques
             };
         } else {
             return {
                 name: op,
-                votos: jogador.votacao[index]
+                votos: votosDaOpcao,
+                porcentagem,
+                quantidadeAtaques
             }
         }
     })
@@ -162,19 +193,19 @@ const votacaoEstado = (req, res) => {
     jogador.opcoes = undefined;
     jogador.votacaoAberta = false;
     jogador.opcoesPadrao.push(...opcoes);
-    res.json({ votosTotal: votosTotal, result });
+    res.json({ votosTotal, numeroInimigos, result });
 }
 
 
 const postVidaJogador = (req, res) => {
   const jogadorId = String(req.params.jogador);
-  const vidaNova = req.body.vidaNova;
+  const numeroInimigos = req.body.numeroInimigos;
 
-  console.log('Recebendo vida:', vidaNova, 'para', jogadorId);
+  console.log('Recebendo numeroInimigos:', numeroInimigos, 'para', jogadorId);
 
   // Atualiza no personagens
   if (personagens[jogadorId]) {
-    personagens[jogadorId].vidaAtual = vidaNova;
+    personagens[jogadorId].numeroInimigos = numeroInimigos;
   } else {
     return res.status(404).json({ error: 'Jogador não encontrado' });
   }
@@ -184,14 +215,14 @@ const postVidaJogador = (req, res) => {
     console.log(`Enviando sse para ${conexoes[jogadorId].length} clientes`);
     conexoes[jogadorId].forEach(res => {
       try {
-        res.write(`data: ${JSON.stringify({ vidaAtual: vidaNova })}\n\n`);
+        res.write(`data: ${JSON.stringify({ numeroInimigos })}\n\n`);
       } catch (err) {
         console.error('Erro ao enviar sse:', err);
       }
     });
   }
 
-  return res.json({ vidaAtual: vidaNova });
+  return res.json({ numeroInimigos });
 };
 
 const votosStream = (req, res) => {
