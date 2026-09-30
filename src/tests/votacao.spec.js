@@ -389,3 +389,296 @@ describe('Dado — Dado.quantidade representa dados por rolagem, não ataques', 
     // (exceto por coincidência estatística)
   });
 });
+
+
+// ===========================================================================
+// NOVOS TESTES — Atividade: "Quem será atacado?" com 5 jogadores
+// ===========================================================================
+
+// ---------------------------------------------------------------------------
+// Helper para montar estado com 5 jogadores-alvo
+// ---------------------------------------------------------------------------
+function criarEstado5Jogadores({ numeroInimigos, votacao, votosTotal }) {
+  const nomes = ['Zenchi', 'Atnos', 'Sam', 'Jogador 4', 'Jogador 5'];
+  return {
+    numeroInimigos,
+    votosTotal,
+    votacao,
+    opcoesComDado: nomes.map(nome =>
+      new OpcaoComDado(nome, [
+        new Dado(20, 1, 'Ataque', 0),
+        new Dado(6,  1, 'Dano',   0),
+      ])
+    ),
+    opcoes: undefined,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// EXEMPLO DA ATIVIDADE
+// 100 inimigos, votos proporcionais a 30/10/25/20/15%
+// Zenchi   → 30 votos → 30% → 30 inimigos
+// Atnos    → 10 votos → 10% → 10 inimigos
+// Sam      → 25 votos → 25% → 25 inimigos
+// Jogador 4 → 20 votos → 20% → 20 inimigos
+// Jogador 5 → 15 votos → 15% → 15 inimigos
+// ---------------------------------------------------------------------------
+describe('5 jogadores — exemplo exato da atividade (100 inimigos, 100 votos)', () => {
+  let resultado;
+
+  beforeEach(() => {
+    const jogador = criarEstado5Jogadores({
+      numeroInimigos: 100,
+      votosTotal: 100,
+      votacao: [30, 10, 25, 20, 15],
+    });
+    resultado = calcularResultadoVotacao(jogador);
+  });
+
+  // --- votosTotal e numeroInimigos ---
+  test('votosTotal retornado é 100', () => {
+    expect(resultado.votosTotal).toBe(100);
+  });
+
+  test('numeroInimigos retornado é 100', () => {
+    expect(resultado.numeroInimigos).toBe(100);
+  });
+
+  // --- Identificação dos jogadores ---
+  test('result[0].name é Zenchi', () => {
+    expect(resultado.result[0].name).toBe('Zenchi');
+  });
+
+  test('result[1].name é Atnos', () => {
+    expect(resultado.result[1].name).toBe('Atnos');
+  });
+
+  test('result[2].name é Sam', () => {
+    expect(resultado.result[2].name).toBe('Sam');
+  });
+
+  test('result[3].name é Jogador 4', () => {
+    expect(resultado.result[3].name).toBe('Jogador 4');
+  });
+
+  test('result[4].name é Jogador 5', () => {
+    expect(resultado.result[4].name).toBe('Jogador 5');
+  });
+
+  // --- Porcentagens ---
+  test('Zenchi → 30%', () => {
+    expect(resultado.result[0].porcentagem).toBe(30);
+  });
+
+  test('Atnos → 10%', () => {
+    expect(resultado.result[1].porcentagem).toBe(10);
+  });
+
+  test('Sam → 25%', () => {
+    expect(resultado.result[2].porcentagem).toBe(25);
+  });
+
+  test('Jogador 4 → 20%', () => {
+    expect(resultado.result[3].porcentagem).toBe(20);
+  });
+
+  test('Jogador 5 → 15%', () => {
+    expect(resultado.result[4].porcentagem).toBe(15);
+  });
+
+  // --- Quantidade de inimigos direcionados ---
+  test('Zenchi → 30 inimigos atacam', () => {
+    expect(resultado.result[0].quantidadeAtaques).toBe(30);
+  });
+
+  test('Atnos → 10 inimigos atacam', () => {
+    expect(resultado.result[1].quantidadeAtaques).toBe(10);
+  });
+
+  test('Sam → 25 inimigos atacam', () => {
+    expect(resultado.result[2].quantidadeAtaques).toBe(25);
+  });
+
+  test('Jogador 4 → 20 inimigos atacam', () => {
+    expect(resultado.result[3].quantidadeAtaques).toBe(20);
+  });
+
+  test('Jogador 5 → 15 inimigos atacam', () => {
+    expect(resultado.result[4].quantidadeAtaques).toBe(15);
+  });
+
+  // --- Rolagens geradas ---
+  test('Zenchi tem 30 rolagens de inimigo', () => {
+    expect(resultado.result[0].ataques).toHaveLength(30);
+  });
+
+  test('Atnos tem 10 rolagens de inimigo', () => {
+    expect(resultado.result[1].ataques).toHaveLength(10);
+  });
+
+  // --- Soma coerente com o total de inimigos ---
+  test('soma dos quantidadeAtaques é igual ao número total de inimigos (100)', () => {
+    const soma = resultado.result.reduce((acc, r) => acc + r.quantidadeAtaques, 0);
+    // Math.round pode causar desvio de ±1 em casos com decimais; aqui todos são exatos
+    expect(soma).toBe(100);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// CASO: um jogador com 0 votos — não recebe nenhum inimigo
+// ---------------------------------------------------------------------------
+describe('5 jogadores — um jogador com 0 votos', () => {
+  let resultado;
+
+  beforeEach(() => {
+    const jogador = criarEstado5Jogadores({
+      numeroInimigos: 100,
+      votosTotal: 100,
+      // Jogador 5 com 0 votos
+      votacao: [40, 20, 25, 15, 0],
+    });
+    resultado = calcularResultadoVotacao(jogador);
+  });
+
+  test('Jogador 5 com 0 votos → 0%', () => {
+    expect(resultado.result[4].porcentagem).toBe(0);
+  });
+
+  test('Jogador 5 com 0 votos → 0 inimigos', () => {
+    expect(resultado.result[4].quantidadeAtaques).toBe(0);
+  });
+
+  test('Jogador 5 com 0 votos → array de ataques vazio', () => {
+    expect(resultado.result[4].ataques).toHaveLength(0);
+  });
+
+  test('jogadores com votos ainda recebem inimigos normalmente', () => {
+    // Math.round(40/100 * 100) = 40
+    expect(resultado.result[0].quantidadeAtaques).toBe(40);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// CASO: 0 votos totais com 5 jogadores — sem divisão por zero
+// ---------------------------------------------------------------------------
+describe('5 jogadores — 0 votos totais', () => {
+  let resultado;
+
+  beforeEach(() => {
+    const jogador = criarEstado5Jogadores({
+      numeroInimigos: 100,
+      votosTotal: 0,
+      votacao: [0, 0, 0, 0, 0],
+    });
+    resultado = calcularResultadoVotacao(jogador);
+  });
+
+  test('não lança exceção', () => {
+    expect(() => calcularResultadoVotacao({
+      numeroInimigos: 100,
+      votosTotal: 0,
+      votacao: [0, 0, 0, 0, 0],
+      opcoesComDado: ['Zenchi', 'Atnos', 'Sam', 'Jogador 4', 'Jogador 5'].map(
+        nome => new OpcaoComDado(nome, [new Dado(20, 1, 'Ataque', 0)])
+      ),
+      opcoes: undefined,
+    })).not.toThrow();
+  });
+
+  test('todos os jogadores têm 0% de votos', () => {
+    resultado.result.forEach(r => {
+      expect(r.porcentagem).toBe(0);
+    });
+  });
+
+  test('todos os jogadores têm 0 inimigos direcionados', () => {
+    resultado.result.forEach(r => {
+      expect(r.quantidadeAtaques).toBe(0);
+    });
+  });
+
+  test('nenhuma rolagem é gerada', () => {
+    resultado.result.forEach(r => {
+      expect(r.ataques).toHaveLength(0);
+    });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// CASO: quantidade diferente de inimigos (ex: 50)
+// Votos: 30/10/25/20/15 (total 100)
+// Zenchi   → 30% de 50 = 15
+// Atnos    → 10% de 50 = 5
+// Sam      → 25% de 50 = Math.round(12.5) = 13
+// Jogador 4 → 20% de 50 = 10
+// Jogador 5 → 15% de 50 = Math.round(7.5) = 8
+// ---------------------------------------------------------------------------
+describe('5 jogadores — 50 inimigos', () => {
+  let resultado;
+
+  beforeEach(() => {
+    const jogador = criarEstado5Jogadores({
+      numeroInimigos: 50,
+      votosTotal: 100,
+      votacao: [30, 10, 25, 20, 15],
+    });
+    resultado = calcularResultadoVotacao(jogador);
+  });
+
+  test('numeroInimigos retornado é 50', () => {
+    expect(resultado.numeroInimigos).toBe(50);
+  });
+
+  test('Zenchi → 30% de 50 = 15 inimigos', () => {
+    expect(resultado.result[0].quantidadeAtaques).toBe(15);
+  });
+
+  test('Atnos → 10% de 50 = 5 inimigos', () => {
+    expect(resultado.result[1].quantidadeAtaques).toBe(5);
+  });
+
+  test('porcentagem não é afetada pelo número de inimigos', () => {
+    expect(resultado.result[0].porcentagem).toBe(30);
+    expect(resultado.result[1].porcentagem).toBe(10);
+    expect(resultado.result[2].porcentagem).toBe(25);
+    expect(resultado.result[3].porcentagem).toBe(20);
+    expect(resultado.result[4].porcentagem).toBe(15);
+  });
+
+  test('soma dos inimigos distribuídos é coerente com Math.round (desvio máx ±2)', () => {
+    // Math.round pode gerar desvio por arredondamento; aceitamos ±(nJogadores/2)
+    const soma = resultado.result.reduce((acc, r) => acc + r.quantidadeAtaques, 0);
+    expect(soma).toBeGreaterThanOrEqual(48);
+    expect(soma).toBeLessThanOrEqual(52);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// CASO: todos os votos concentrados em um único jogador
+// ---------------------------------------------------------------------------
+describe('5 jogadores — todos os votos em um jogador', () => {
+  let resultado;
+
+  beforeEach(() => {
+    const jogador = criarEstado5Jogadores({
+      numeroInimigos: 100,
+      votosTotal: 50,
+      votacao: [50, 0, 0, 0, 0],
+    });
+    resultado = calcularResultadoVotacao(jogador);
+  });
+
+  test('Zenchi com 100% dos votos → 100 inimigos', () => {
+    expect(resultado.result[0].quantidadeAtaques).toBe(100);
+  });
+
+  test('Zenchi → 100%', () => {
+    expect(resultado.result[0].porcentagem).toBe(100);
+  });
+
+  test('demais jogadores → 0 inimigos', () => {
+    [1, 2, 3, 4].forEach(i => {
+      expect(resultado.result[i].quantidadeAtaques).toBe(0);
+    });
+  });
+});
